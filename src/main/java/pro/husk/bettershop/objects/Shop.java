@@ -31,6 +31,7 @@ public class Shop {
     @Getter
     private Menu menu;
 
+    @Getter
     private final List<ShopItem> shopItems;
 
     public boolean isBeingEdited() {

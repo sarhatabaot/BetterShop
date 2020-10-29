@@ -1,6 +1,8 @@
 package pro.husk.bettershop.util;
 
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,6 +32,11 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setAmount(int newAmount) {
+        itemStack.setAmount(newAmount);
+        return this;
+    }
+
     public ItemBuilder addLore(String... lines) {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
@@ -48,5 +55,42 @@ public class ItemBuilder {
         itemStack.setItemMeta(itemMeta);
 
         return this;
+    }
+
+    public ItemBuilder setLore(List<String> lore) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        itemMeta.setLore(lore);
+        itemStack.setItemMeta(itemMeta);
+
+        return this;
+    }
+
+    public ItemBuilder setLoreIfSetOnArgument(ItemStack argument) {
+        ItemMeta itemMeta = argument.getItemMeta();
+
+        if (itemMeta != null) {
+            if (itemMeta.hasLore()) {
+                this.setLore(itemMeta.getLore());
+            }
+        }
+
+        return this;
+    }
+
+    public ItemBuilder addNameToLoreIfSetOnArgument(ItemStack argument) {
+        ItemMeta itemMeta = argument.getItemMeta();
+
+        if (itemMeta != null) {
+            if (itemMeta.hasDisplayName()) {
+                this.addLore(ChatColor.WHITE + itemMeta.getDisplayName());
+            }
+        }
+
+        return this;
+    }
+
+    public boolean hasLore() {
+        return itemStack.getItemMeta().hasLore();
     }
 }
