@@ -1,4 +1,4 @@
-# Welcome to BetterShop
+# Welcome to BetterShop ![build status](https://ci.husk.pro/BetterShop/badge)
 
 This is a rewrite of the original [Shop by Conjurate](https://github.com/Nowaha/Shop-by-Conjurate) with a few goals in mind:
 
