@@ -2,8 +2,11 @@ package pro.husk.bettershop.util;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.Menu;
+import org.ipvp.canvas.slot.ClickOptions;
 import org.ipvp.canvas.slot.Slot;
 import org.ipvp.canvas.type.ChestMenu;
 import pro.husk.bettershop.events.PlayerChatInput;
@@ -15,31 +18,81 @@ import pro.husk.bettershop.objects.ShopManager;
 public class MenuHelper {
 
     /**
-     * Main method of handling edit menu..
-     * todo seperate this into bite sized chunks
+     * Main method of handling edit menu.. todo seperate this into bite sized chunks
      *
      * @param shopItem that is being edited
      * @param shopName that the shopItem belongs to
      */
-    public static Menu getEditMenu(ShopItem shopItem, String shopName) {
-        Menu menu = ChestMenu
-                .builder(1)
-                .title("Editing item for: " + shopName)
-                .build();
+    public static void openEditMenu(Player playerToOpenFor, ShopItem shopItem, String shopName) {
+        Menu menu = ChestMenu.builder(3).title(ChatColor.GOLD + shopName).build();
 
         menu.setCloseHandler((player, closedMenu) -> {
             Shop editingShop = ShopManager.getEditingMap().get(player.getUniqueId());
 
             if (editingShop != null) {
                 editingShop.saveEdits(shopItem);
+
+                // Remove user from editing map
+                ShopManager.getEditingMap().remove(player.getUniqueId());
             }
         });
 
-        Slot slot = menu.getSlot(0);
-        slot.setItem(new ItemBuilder(Material.BOOK)
-                .setName(ChatColor.GOLD + "Item display")
-                .addLore(ChatColor.YELLOW + "Modify your item's display")
-                .getItemStack());
+        // Set the invidiual items
+        setEditDisplayItem(menu, shopItem);
+        setEditFunctionItem(menu, shopItem, shopName);
+        setDisplayItem(menu, shopItem);
+
+        ShopFunction shopFunction = shopItem.getShopFunction();
+
+        if (shopFunction == ShopFunction.BUY || shopFunction == ShopFunction.COMMAND) {
+            setEditBuyCostItem(menu, shopItem);
+        } else if (shopFunction == ShopFunction.SELL) {
+            setEditSellPriceItem(menu, shopItem);
+        } else if (shopFunction == ShopFunction.TRADE) {
+            setEditContentsItem(menu, shopItem);
+        }
+
+        for (int i = 0; i < menu.getDimensions().getArea(); i++) {
+            Slot empty = menu.getSlot(i);
+
+            ItemStack item = empty.getItem(playerToOpenFor);
+
+            if (item == null || item.getType() == Material.AIR) {
+                empty.setItem(new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("").getItemStack());
+            }
+        }
+
+        menu.open(playerToOpenFor);
+    }
+
+    private static void openFunctionMenu(ShopItem shopItem, String shopName) {
+        Menu menu = ChestMenu.builder(1).title("Editing function for item in shop: " + shopName).build();
+
+        // Display an item for each function
+        for (int i = 0; i < ShopFunction.values().length; i++) {
+            ShopFunction function = ShopFunction.values()[i];
+            Slot slot = menu.getSlot(i);
+
+            slot.setItemTemplate(player -> new ItemBuilder(Material.BOOKSHELF).setName(ChatColor.GOLD + function.name())
+                    .getItemStack());
+
+            // Click handler for the function change
+            slot.setClickHandler((player, clickInformation) -> {
+                if (clickInformation.getClickType() == ClickType.LEFT) {
+                    int clickedSlotIndex = clickInformation.getClickedSlot().getIndex();
+                    shopItem.setShopFunction(ShopFunction.values()[clickedSlotIndex]);
+
+                    // Reopen the shop edit menu
+                    openEditMenu(player, shopItem, shopName);
+                }
+            });
+        }
+    }
+
+    private static void setEditDisplayItem(Menu menu, ShopItem shopItem) {
+        Slot slot = menu.getSlot(13);
+        slot.setItem(new ItemBuilder(Material.BOOK).setName(ChatColor.GOLD + "Item display")
+                .addLore(ChatColor.YELLOW + "Modify your item's display").getItemStack());
 
         // Click handler for change display name
         slot.setClickHandler((player, clickInformation) -> {
@@ -58,104 +111,58 @@ public class MenuHelper {
                 }, "Please enter the new name (including colours / hex)");
             }
         });
+    }
 
-        slot = menu.getSlot(1);
-        slot.setItem(new ItemBuilder(Material.INK_SAC)
-                .setName(ChatColor.GOLD + "Function")
-                .addLore(ChatColor.GREEN + "Change the function of your item")
+    private static void setEditFunctionItem(Menu menu, ShopItem shopItem, String shopName) {
+        Slot slot = menu.getSlot(1);
+        slot.setItem(new ItemBuilder(Material.EMERALD).setName(ChatColor.GREEN + "Function")
+                .addLore(ChatColor.GOLD + "Change the function of your item")
                 .addLore(ChatColor.BLUE + "Current function: " + ChatColor.AQUA + shopItem.getShopFunction().name())
                 .getItemStack());
 
         // Click handler for change function type
         slot.setClickHandler((player, clickInformation) -> openFunctionMenu(shopItem, shopName));
+    }
 
-        ShopFunction shopFunction = shopItem.getShopFunction();
+    private static void setEditBuyCostItem(Menu menu, ShopItem shopItem) {
+        Slot slot = menu.getSlot(19);
 
-        if (shopFunction == ShopFunction.BUY
-                || shopFunction == ShopFunction.COMMAND) {
-            slot = menu.getSlot(2);
+        slot.setItem(new ItemBuilder(Material.GOLD_INGOT).setName(ChatColor.GOLD + "Change cost")
+                .addLore(ChatColor.WHITE + "Cost: " + ChatColor.GREEN + shopItem.getBuyCost()).getItemStack());
 
-            slot.setItem(new ItemBuilder(Material.GOLD_INGOT)
-                    .setName(ChatColor.GOLD + "Set price")
-                    .getItemStack());
+        // Set buy cost click handling
+        slot.setClickHandler((player, clickInformation) -> {
+            PlayerChatInput.addWaitingOnInput(player, callback -> {
+                shopItem.setBuyCost(Integer.parseInt(callback));
+            }, "Please input the cost to buy this item:");
+        });
+    }
 
-            // Set buy cost click handling
-            slot.setClickHandler((player, clickInformation) -> {
-                PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.setBuyCost(Integer.parseInt(callback));
-                }, "Please input the cost to buy this item:");
-            });
+    private static void setEditSellPriceItem(Menu menu, ShopItem shopItem) {
+        Slot slot = menu.getSlot(19);
 
-        } else if (shopFunction == ShopFunction.SELL) {
-            // Set sell cost click handling
-            slot.setClickHandler((player, clickInformation) -> {
-                PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.setSellCost(Integer.parseInt(callback));
-                }, "Please input the price to sell this item at:");
-                menu.close(player);
-            });
-        }
+        slot.setItem(new ItemBuilder(Material.DIAMOND).setName(ChatColor.GOLD + "Change sell cost")
+                .addLore(ChatColor.WHITE + "Sell: " + ChatColor.GREEN + shopItem.getSellCost()).getItemStack());
 
-        slot = menu.getSlot(8);
+        // Set sell cost click handling
+        slot.setClickHandler((player, clickInformation) -> {
+            PlayerChatInput.addWaitingOnInput(player, callback -> {
+                shopItem.setSellCost(Integer.parseInt(callback));
+            }, "Please input the price to sell this item at:");
+            menu.close(player);
+        });
+    }
 
+    private static void setDisplayItem(Menu menu, ShopItem shopItem) {
+        Slot slot = menu.getSlot(4);
         slot.setItem(shopItem.getItemBuilder().getItemStack());
-
-        return menu;
+        slot.setClickOptions(ClickOptions.DENY_ALL);
     }
 
-    private static void openFunctionMenu(ShopItem shopItem, String shopName) {
-        Menu menu = ChestMenu
-                .builder(1)
-                .title("Editing function for item in shop: " + shopName)
-                .build();
-
-        // Display an item for each function
-        for (int i = 0; i < ShopFunction.values().length; i++) {
-            ShopFunction function = ShopFunction.values()[i];
-            Slot slot = menu.getSlot(i);
-
-            slot.setItemTemplate(player -> new ItemBuilder(Material.BOOKSHELF)
-                    .setName(ChatColor.GOLD + function.name())
-                    .getItemStack());
-
-            // Click handler for the function change
-            slot.setClickHandler((player, clickInformation) -> {
-                if (clickInformation.getClickType() == ClickType.LEFT) {
-                    int clickedSlotIndex = clickInformation.getClickedSlot().getIndex();
-                    shopItem.setShopFunction(ShopFunction.values()[clickedSlotIndex]);
-
-                    // Reopen the shop edit menu
-                    getEditMenu(shopItem, shopName).open(player);
-                }
-            });
-        }
-    }
-
-    /**
-     * Helper method to colourise a string with a combination of both hex and legacy chat colours
-     *
-     * @param input string to colourise
-     * @return colourised string
-     */
-    public static String colourise(String input) {
-        while (input.contains("#")) {
-            int index = input.indexOf("#");
-            if (index != 0 && input.charAt(index - 1) == '&') {
-                String hexSubstring = input.substring(index - 1, index + 7).replaceAll("&", "");
-
-                try {
-                    ChatColor transformed = ChatColor.of(hexSubstring);
-                    // Apply transformation to original string
-                    input = input.replaceAll("&" + hexSubstring, transformed + "");
-                } catch (IllegalArgumentException ignored) {
-
-                }
-            } else {
-                break;
-            }
-        }
-
-        // Apply legacy transformations at end
-        return ChatColor.translateAlternateColorCodes('&', input);
+    private static void setEditContentsItem(Menu menu, ShopItem shopItem) {
+        Slot slot = menu.getSlot(19);
+        slot.setItem(new ItemBuilder(Material.CHEST).setName(ChatColor.GREEN + "Item Inventory")
+                .addLore(ChatColor.GOLD + "Edit item's inventory").getItemStack());
+        slot.setClickOptions(ClickOptions.DENY_ALL);
     }
 }

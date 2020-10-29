@@ -3,7 +3,6 @@ package pro.husk.bettershop;
 import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ipvp.canvas.MenuFunctionListener;
 import pro.husk.bettershop.commands.BetterShopCommands;

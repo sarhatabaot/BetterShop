@@ -24,7 +24,7 @@ public class ItemBuilder {
     public ItemBuilder setName(String name) {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        itemMeta.setDisplayName(MenuHelper.colourise(name));
+        itemMeta.setDisplayName(StringUtil.colourise(name));
         itemStack.setItemMeta(itemMeta);
 
         return this;
@@ -40,7 +40,7 @@ public class ItemBuilder {
         }
 
         for (String line : lines) {
-            lore.add(MenuHelper.colourise(line));
+            lore.add(StringUtil.colourise(line));
         }
 
         itemMeta.setLore(lore);

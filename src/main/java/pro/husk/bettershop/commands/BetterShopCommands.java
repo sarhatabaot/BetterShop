@@ -71,9 +71,9 @@ public class BetterShopCommands extends BaseCommand {
         sender.sendMessage(ChatColor.GOLD + "====================");
     }
 
-    @Subcommand("test")
+    @Subcommand("t")
     @Description("test")
     public void test(Player player) {
-        MenuHelper.getEditMenu(new ShopItem(new ItemStack(Material.OBSIDIAN), ShopFunction.BUY), "test").open(player);
+        MenuHelper.openEditMenu(player, new ShopItem(new ItemStack(Material.OBSIDIAN), ShopFunction.BUY), "test");
     }
 }
