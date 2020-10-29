@@ -1,11 +1,15 @@
 package pro.husk.bettershop.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Optional;
+import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.objects.Config;
@@ -14,7 +18,7 @@ import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.util.MenuHelper;
 
-@CommandAlias("shop")
+@CommandAlias("bshop|bs")
 @Description("BetterShop commands")
 public class BetterShopCommands extends BaseCommand {
 
