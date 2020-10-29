@@ -1,0 +1,8 @@
+name: BetterShop
+version: ${project.version}
+main: pro.husk.bettershop.BetterShop
+api-version: 1.16
+depend: [ Vault ]
+authors: [ husK ]
+description: Rewrite of Shop by Conjurate
+website: https://husk.pro/
