@@ -1,6 +1,4 @@
-package pro.husk.bettershop.objects.gui;
-
-import java.util.Optional;
+package pro.husk.bettershop.objects.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -8,30 +6,30 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 
 import net.md_5.bungee.api.ChatColor;
 
-import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 
 import lombok.Getter;
 import pro.husk.bettershop.objects.Shop;
-import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.Visibility;
+import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 
-public class EditShopDisplay {
+public class EditShopDisplay implements CommonGUI {
 
     @Getter
     private Gui gui;
-
+    private Shop shop;
+    private StaticPane pane;
     private ShopItem moveItem;
 
     public EditShopDisplay(Shop shop) {
+        this.shop = shop;
         this.gui = new Gui(6, ChatColor.GOLD + shop.getName());
+        this.pane = new StaticPane(0, 0, 9, 6);
 
-        StaticPane pane = new StaticPane(0, 0, 9, 6);
-        renderShopItems(shop, pane);
+        forceRefreshGUI();
 
         gui.setOnOutsideClick(onOutsideClick -> {
             onOutsideClick.setCancelled(true);
@@ -44,7 +42,7 @@ public class EditShopDisplay {
 
             // Handle moving items from bottom inv to upper
             if (moveItem != null) {
-                if (isItemStackEmpty(clickedItem)) {
+                if (MenuHelper.isItemStackEmpty(clickedItem)) {
                     shop.addItem(moveItem, SlotLocation.fromSlotNumber(click.getSlot(), pane.getLength()));
                     click.getWhoClicked().getInventory().remove(moveItem.getItemBuilder().getItemStack());
                     moveItem = null;
@@ -57,7 +55,7 @@ public class EditShopDisplay {
                     gui.setTitle(ChatColor.GREEN + "Now select the new slot");
                 } else if (click.isLeftClick()) {
                     if (clickedShopItem != null) {
-                        EditShopItemGUI editShopItemGUI = new EditShopItemGUI(clickedShopItem, gui);
+                        EditShopItemGUI editShopItemGUI = new EditShopItemGUI(clickedShopItem, this);
                         editShopItemGUI.getGui().show(click.getWhoClicked());
                     }
                 }
@@ -70,9 +68,8 @@ public class EditShopDisplay {
         gui.setOnBottomClick(click -> {
             ItemStack clickedItem = click.getCurrentItem();
 
-            if (!isItemStackEmpty(clickedItem)) {
-                moveItem = new ShopItem(clickedItem, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, Optional.empty(),
-                        Optional.empty());
+            if (!MenuHelper.isItemStackEmpty(clickedItem)) {
+                moveItem = new ShopItem(clickedItem);
                 gui.setTitle(ChatColor.GREEN + "Now select the new slot");
             }
 
@@ -82,26 +79,22 @@ public class EditShopDisplay {
         gui.addPane(pane);
     }
 
-    private boolean isItemStackEmpty(ItemStack check) {
-        if (check == null)
-            return true;
-        if (check.getType() == Material.AIR)
-            return true;
-
-        return false;
-    }
-
     private void renderShopItems(Shop shop, StaticPane pane) {
         shop.getContentsMap().forEach((slotLocation, shopItem) -> {
             ItemStack itemStack = shopItem.getItemBuilder().getItemStack();
 
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 if (event.getClick() == ClickType.RIGHT) {
-                    new EditShopItemGUI(shopItem, gui).getGui().show(event.getWhoClicked());
+                    new EditShopItemGUI(shopItem, this).show(event.getWhoClicked());
                 }
             });
 
             pane.addItem(guiItem, slotLocation.getX(), slotLocation.getY());
         });
+    }
+
+    @Override
+    public void forceRefreshGUI() {
+        renderShopItems(shop, pane);
     }
 }

@@ -1,34 +1,38 @@
-package pro.husk.bettershop.objects.gui;
+package pro.husk.bettershop.objects.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 
-import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import lombok.Getter;
 import pro.husk.bettershop.events.PlayerChatInput;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
+import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
+import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 
-public class EditShopItemGUI {
-
-    @Getter
-    private ShopItem shopItem;
+public class EditShopItemGUI implements CommonGUI {
 
     @Getter
     private Gui gui;
+    private ShopItem shopItem;
+    private CommonGUI backGui;
+    private StaticPane pane;
 
-    public EditShopItemGUI(ShopItem shopItem, Gui backGui) {
+    public EditShopItemGUI(ShopItem shopItem, CommonGUI backGui) {
         this.shopItem = shopItem;
-        this.gui = new Gui(3, ChatColor.GOLD + "Editing item");
+        this.gui = new Gui(3, ChatColor.GOLD + "Editing item:");
+        this.backGui = backGui;
+        this.pane = new StaticPane(0, 0, 9, 3);
 
-        StaticPane pane = new StaticPane(0, 0, 9, 3);
-        renderItems(pane, backGui);
+        forceRefreshGUI();
 
         // Disable outside clicks
         gui.setOnOutsideClick(onOutsideClick -> {
@@ -43,7 +47,7 @@ public class EditShopItemGUI {
         gui.addPane(pane);
     }
 
-    private void renderItems(StaticPane pane, Gui backGui) {
+    private void renderItems(StaticPane pane, CommonGUI backGui) {
         ItemStack displayItem = shopItem.getItemBuilder().getItemStack();
 
         // Build all ItemStacks of our items
@@ -64,26 +68,34 @@ public class EditShopItemGUI {
         ItemStack editContentsItem = new ItemBuilder(Material.CHEST).setName(ChatColor.GREEN + "Item inventory")
                 .addLore(ChatColor.GOLD + "Edit item's inventory").getItemStack();
 
-        ItemStack editMessagesItem = new ItemBuilder(Material.PAPER).setName(ChatColor.GOLD + "Messages")
-                .addLore(ChatColor.YELLOW + "Manage the messages your item sends").getItemStack();
+        ItemBuilder editMessagesItemBuilder = new ItemBuilder(Material.PAPER).setName(ChatColor.GOLD + "Messages")
+                .addLore(ChatColor.YELLOW + "Manage the messages your item sends");
+
+        // Add the messages in the item's lore if present
+        if (shopItem.getMessagesOptional().isPresent()) {
+            editMessagesItemBuilder.addLore("");
+
+            shopItem.getMessagesOptional().get().forEach(message -> {
+                editMessagesItemBuilder.addLore(message);
+            });
+        }
+
+        ItemStack editMessagesItem = editMessagesItemBuilder.getItemStack();
 
         ItemStack editVisibilityItem = new ItemBuilder(Material.GLASS).setName(ChatColor.GREEN + "Change visibility")
                 .addLore(ChatColor.WHITE + "Visibility: " + ChatColor.YELLOW + shopItem.getVisibility()).getItemStack();
-
-        ItemStack backButtonItem = new ItemBuilder(Material.COMPASS).setName(ChatColor.RED + "Back")
-                .addLore(ChatColor.GOLD + "Go back a page").getItemStack();
 
         // Build GuiItem of each of the ItemStacks
         GuiItem displayGuiItem = new GuiItem(displayItem, event -> event.setCancelled(true));
 
         GuiItem editDisplayGuiItem = new GuiItem(editDisplayItem, event -> {
-            Player player = (Player) event.getWhoClicked();
             Gui editDisplay = new EditDisplayItemGUI(shopItem, gui).getGui();
-            editDisplay.show(player);
+            editDisplay.show(event.getWhoClicked());
         });
 
         GuiItem editFunctionGuiItem = new GuiItem(editFunctionItem, event -> {
-
+            Gui editFunction = new EditShopItemFunction(shopItem, this).getGui();
+            editFunction.show(event.getWhoClicked());
         });
 
         GuiItem editBuyCostGuiItem = new GuiItem(editBuyCostItem, event -> {
@@ -93,8 +105,7 @@ public class EditShopItemGUI {
             PlayerChatInput.addWaitingOnInput(player, callback -> {
                 shopItem.setBuyCost(Integer.parseInt(callback));
                 PlayerChatInput.removeWaitingOnInput(player);
-                renderItems(pane, backGui);
-                gui.update();
+                this.show(player);
             }, "Please input the cost to buy this item");
         });
 
@@ -105,13 +116,13 @@ public class EditShopItemGUI {
             PlayerChatInput.addWaitingOnInput(player, callback -> {
                 shopItem.setSellCost(Integer.parseInt(callback));
                 PlayerChatInput.removeWaitingOnInput(player);
-                renderItems(pane, backGui);
-                gui.update();
+                this.show(player);
             }, "Please input the price rewarded on sale of this item");
         });
 
         GuiItem editContentsGuiItem = new GuiItem(editContentsItem, event -> {
-
+            Gui editContents = new EditShopItemContents(shopItem, this).getGui();
+            editContents.show(event.getWhoClicked());
         });
 
         GuiItem editMessagesGuiItem = new GuiItem(editMessagesItem, event -> {
@@ -121,18 +132,13 @@ public class EditShopItemGUI {
             PlayerChatInput.addWaitingOnInput(player, callback -> {
                 shopItem.addMessage(callback);
                 PlayerChatInput.removeWaitingOnInput(player);
-                renderItems(pane, backGui);
-                gui.update();
+                this.show(player);
             }, "Please input the new message");
         });
 
         GuiItem editVisibilityGuiItem = new GuiItem(editVisibilityItem, event -> {
-
-        });
-
-        GuiItem backButtonGuiItem = new GuiItem(backButtonItem, click -> {
-            click.setCancelled(true);
-            backGui.show(click.getWhoClicked());
+            Gui editVisibility = new EditShopItemVisibility(shopItem, this).getGui();
+            editVisibility.show(event.getWhoClicked());
         });
 
         // Build the SlotLocation for each of these
@@ -152,7 +158,7 @@ public class EditShopItemGUI {
         pane.addItem(editFunctionGuiItem, editFunctionSlot.getX(), editFunctionSlot.getY());
         pane.addItem(editMessagesGuiItem, editMessagesSlot.getX(), editMessagesSlot.getY());
         pane.addItem(editVisibilityGuiItem, editVisiblitySlot.getX(), editVisiblitySlot.getY());
-        pane.addItem(backButtonGuiItem, backButtonSlot.getX(), backButtonSlot.getY());
+        pane.addItem(MenuHelper.getBackButton(backGui), backButtonSlot.getX(), backButtonSlot.getY());
 
         // Build the gui relevant to the function
         ShopFunction function = shopItem.getShopFunction();
@@ -169,5 +175,10 @@ public class EditShopItemGUI {
 
         ItemStack filler = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("").getItemStack();
         pane.fillWith(filler);
+    }
+
+    @Override
+    public void forceRefreshGUI() {
+        renderItems(pane, backGui);
     }
 }

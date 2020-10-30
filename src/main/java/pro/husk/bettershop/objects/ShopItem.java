@@ -44,6 +44,9 @@ public class ShopItem {
     @Getter
     private Optional<List<String>> messagesOptional;
 
+    @Getter
+    private List<ItemStack> contents;
+
     /**
      * Constructor for a ShopItem
      * 
@@ -60,7 +63,8 @@ public class ShopItem {
      * @param messagesOptional   what messages to send the user upon sale
      */
     public ShopItem(ItemStack itemStack, ShopFunction shopFunction, int buyCost, int sellCost, int cooldownSeconds,
-            Visibility visibility, Optional<String> permissionOptional, Optional<List<String>> messagesOptional) {
+            Visibility visibility, Optional<String> permissionOptional, Optional<List<String>> messagesOptional,
+            List<ItemStack> contents) {
         this.itemBuilder = new ItemBuilder(itemStack);
         this.shopFunction = shopFunction;
         this.buyCost = buyCost;
@@ -69,10 +73,22 @@ public class ShopItem {
         this.visibility = visibility;
         this.permissionOptional = permissionOptional;
         this.messagesOptional = messagesOptional;
+        this.contents = contents;
+    }
+
+    /**
+     * Used when creating a new ShopItem
+     * 
+     * @param itemStack of the ShopItem
+     */
+    public ShopItem(ItemStack itemStack) {
+        this(itemStack, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, Optional.empty(), Optional.empty(),
+                new ArrayList<>());
     }
 
     /**
      * Adds a message to the optional list
+     * 
      * @param message to add
      */
     public void addMessage(String message) {
@@ -87,6 +103,7 @@ public class ShopItem {
 
     /**
      * Builds the display ItemStack ready for display on the Shop browse page
+     * 
      * @return ItemStack of this ShopItem instance
      */
     public ItemStack getDisplayItem() {

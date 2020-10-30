@@ -4,7 +4,7 @@ import co.aikar.commands.BukkitCommandExecutionContext;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.contexts.ContextResolver;
 import lombok.Getter;
-import pro.husk.bettershop.objects.gui.EditShopDisplay;
+import pro.husk.bettershop.objects.gui.edit.EditShopDisplay;
 import pro.husk.bettershop.util.SlotLocation;
 
 import org.bukkit.configuration.file.YamlConfiguration;
