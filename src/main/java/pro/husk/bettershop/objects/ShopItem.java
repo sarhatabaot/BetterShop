@@ -9,7 +9,6 @@ import pro.husk.bettershop.util.ItemBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ShopItem {
 
@@ -23,11 +22,11 @@ public class ShopItem {
 
     @Getter
     @Setter
-    private double buyCost;
+    private int buyCost;
 
     @Getter
     @Setter
-    private double sellCost;
+    private int sellCost;
 
     @Getter
     @Setter
@@ -39,41 +38,46 @@ public class ShopItem {
 
     @Getter
     @Setter
-    private Optional<String> permissionOptional;
+    private String permission;
 
     @Getter
-    private Optional<List<String>> messagesOptional;
+    private List<String> messages;
 
     @Getter
-    private List<ItemStack> contents;
+    private List<String> commands;
+
+    @Getter
+    private final List<ItemStack> contents;
 
     /**
      * Constructor for a ShopItem
      *
-     * @param itemStack          itemstack of the item
-     * @param shopFunction       function of the item
-     * @param buyCost            how much it cost to buy this item
-     * @param sellCost           how much a player is rewarded on selling this item
-     *                           (per 1)
-     * @param cooldownSeconds    how long a player is affected by a cooldown on this
-     *                           item's shop function
-     * @param visibility         who can see the item
-     * @param permissionOptional what permission the user should have to see this
-     *                           item
-     * @param messagesOptional   what messages to send the user upon sale
+     * @param itemStack       itemstack of the item
+     * @param shopFunction    function of the item
+     * @param buyCost         how much it cost to buy this item
+     * @param sellCost        how much a player is rewarded on selling this item
+     *                        (per 1)
+     * @param cooldownSeconds how long a player is affected by a cooldown on this
+     *                        item's shop function
+     * @param visibility      who can see the item
+     * @param permission      what permission the user should have to see this
+     *                        item
+     * @param messages        what messages to send the user upon sale
+     * @param commands        what commands are run after an item sale
      */
-    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, double buyCost, double sellCost,
-                    int cooldownSeconds, Visibility visibility, Optional<String> permissionOptional,
-                    Optional<List<String>> messagesOptional, List<ItemStack> contents) {
+    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, int buyCost, int sellCost,
+                    int cooldownSeconds, Visibility visibility, String permission,
+                    List<String> messages, List<ItemStack> contents, List<String> commands) {
         this.itemStack = itemStack;
         this.shopFunction = shopFunction;
         this.buyCost = buyCost;
         this.sellCost = sellCost;
         this.cooldownSeconds = cooldownSeconds;
         this.visibility = visibility;
-        this.permissionOptional = permissionOptional;
-        this.messagesOptional = messagesOptional;
+        this.messages = messages;
+        this.permission = permission;
         this.contents = contents;
+        this.commands = commands;
     }
 
     /**
@@ -82,8 +86,8 @@ public class ShopItem {
      * @param itemStack of the ShopItem
      */
     public ShopItem(ItemStack itemStack) {
-        this(itemStack, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, Optional.empty(), Optional.empty(),
-                new ArrayList<>());
+        this(itemStack, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, null, null,
+                new ArrayList<>(), null);
     }
 
     /**
@@ -92,12 +96,12 @@ public class ShopItem {
      * @param message to add
      */
     public void addMessage(String message) {
-        if (messagesOptional.isPresent()) {
-            messagesOptional.get().add(message);
+        if (messages != null) {
+            messages.add(message);
         } else {
             List<String> messagesList = new ArrayList<>();
             messagesList.add(message);
-            this.messagesOptional = Optional.of(messagesList);
+            this.messages = messagesList;
         }
     }
 
@@ -132,5 +136,12 @@ public class ShopItem {
     public String getItemStackName() {
         ItemMeta itemMeta = itemStack.getItemMeta();
         return itemMeta.getDisplayName();
+    }
+
+    public void addCommand(String command) {
+        if (this.commands == null) {
+            this.commands = new ArrayList<>();
+        }
+        this.commands.add(command);
     }
 }

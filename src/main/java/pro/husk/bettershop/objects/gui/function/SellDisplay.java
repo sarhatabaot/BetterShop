@@ -168,8 +168,8 @@ public class SellDisplay implements CommonGUI {
             TransactionUtil.removeCustomItem(player, itemStack);
             TransactionUtil.add(player, amount);
 
-            List<String> messages = shopItem.getMessagesOptional().get();
-            if (messages.size() != 0) {
+            List<String> messages = shopItem.getMessages();
+            if (messages != null) {
                 messages.forEach(player::sendMessage);
             } else {
                 player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.AQUA + amount + ChatColor.WHITE

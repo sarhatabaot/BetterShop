@@ -92,7 +92,8 @@ public class EditDisplayItemGUI implements CommonGUI {
             if (event.getClick() == ClickType.LEFT) {
                 player.closeInventory();
                 PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.setItemStack(ItemBuilder.builder(shopItemStack).amount(Integer.parseInt(callback)).build());
+                    shopItem.setItemStack(
+                            ItemBuilder.builder(shopItemStack).amount(Integer.parseInt(callback)).build());
                     PlayerChatInput.removeWaitingOnInput(player);
                     renderItems(pane, backGui);
                     gui.show(player);

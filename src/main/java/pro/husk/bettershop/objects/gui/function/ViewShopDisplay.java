@@ -13,8 +13,7 @@ import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.Visibility;
 import pro.husk.bettershop.objects.gui.CommonGUI;
-
-import java.util.Optional;
+import pro.husk.bettershop.util.TransactionUtil;
 
 public class ViewShopDisplay implements CommonGUI {
 
@@ -43,12 +42,10 @@ public class ViewShopDisplay implements CommonGUI {
         shop.getContentsMap().forEach((slotLocation, shopItem) -> {
             Visibility visibility = shopItem.getVisibility();
 
-            Optional<String> permissionOptional = shopItem.getPermissionOptional();
-            boolean isSome = permissionOptional.isPresent();
+            String permission = shopItem.getPermission();
+            boolean isSome = permission != null;
 
-            boolean hideItem = (visibility == Visibility.HIDDEN
-                    || (isSome && !viewer.hasPermission(permissionOptional.get())));
-
+            boolean hideItem = visibility == Visibility.HIDDEN || (isSome && !viewer.hasPermission(permission));
             if (!hideItem) {
                 ItemStack itemStack = shopItem.getDisplayItem();
 
@@ -66,13 +63,21 @@ public class ViewShopDisplay implements CommonGUI {
         if (function == ShopFunction.BUY) {
             new BuyDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.SELL) {
-            
+            new SellDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.TRADE) {
-
+            new TradeDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.COMMAND) {
-
+            processCommandSale(player, shopItem);
         } else if (function == ShopFunction.NONE) {
             event.setCancelled(true);
+        }
+    }
+
+    private void processCommandSale(Player player, ShopItem shopItem) {
+        double balance = TransactionUtil.getBalance(player);
+
+        if (balance >= shopItem.getBuyCost()) {
+            TransactionUtil.deduct(player, shopItem.getBuyCost());
         }
     }
 

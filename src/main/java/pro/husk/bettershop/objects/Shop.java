@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class Shop {
@@ -75,41 +74,27 @@ public class Shop {
         Shop shop = new Shop(shopFile.getName().replaceAll(".yml", ""), configuration);
 
         ConfigurationSection section = configuration.getConfigurationSection("shop.contents");
-        if (section == null)
-            return null;
+        if (section == null) return null;
+
+        // Load each of the items
         section.getKeys(false).forEach(key -> {
             String functionString = section.getString(key + ".function");
-            double buyCost = section.getDouble(key + ".buy_cost");
-            double sellCost = section.getDouble(key + ".sell_cost");
+            int buyCost = section.getInt(key + ".buy_cost");
+            int sellCost = section.getInt(key + ".sell_cost");
             String visibilityString = section.getString(key + ".visibility");
             int cooldown = section.getInt(key + ".cooldown");
             ItemStack itemStack = section.getItemStack(key + ".itemstack.display");
             List<ItemStack> itemStackContents = (List<ItemStack>) section.getList(key + ".itemstack.contents");
-
             List<String> messages = section.getStringList(key + ".messages");
             String permission = section.getString(key + ".permission");
-
-            Optional<List<String>> messagesOptional;
-            Optional<String> permissionOptional;
-
-            if (messages == null) {
-                messagesOptional = Optional.empty();
-            } else {
-                messagesOptional = Optional.of(messages);
-            }
-
-            if (permission == null) {
-                permissionOptional = Optional.empty();
-            } else {
-                permissionOptional = Optional.of(permission);
-            }
+            List<String> commands = section.getStringList(key + ".commands");
 
             ShopFunction function = ShopFunction.valueOf(functionString);
             Visibility visibility = Visibility.valueOf(visibilityString);
 
             SlotLocation slotLocation = SlotLocation.fromString(key);
-            ShopItem shopItem = new ShopItem(itemStack, function, buyCost, sellCost, cooldown, visibility,
-                    permissionOptional, messagesOptional, itemStackContents);
+            ShopItem shopItem = new ShopItem(itemStack, function, buyCost, sellCost, cooldown, visibility, permission,
+                    messages, itemStackContents, commands);
 
             shop.getContentsMap().put(slotLocation, shopItem);
         });
@@ -126,20 +111,16 @@ public class Shop {
 
         contentsMap.forEach((slotLocation, shopItem) -> {
             String slotLocationString = slotLocation.toString();
-
             configuration.set("shop.contents." + slotLocationString + ".function", shopItem.getShopFunction().name());
             configuration.set("shop.contents." + slotLocationString + ".buy_cost", shopItem.getBuyCost());
             configuration.set("shop.contents." + slotLocationString + ".sell_cost", shopItem.getSellCost());
             configuration.set("shop.contents." + slotLocationString + ".visibility", shopItem.getVisibility().name());
             configuration.set("shop.contents." + slotLocationString + ".cooldown", shopItem.getCooldownSeconds());
             configuration.set("shop.contents." + slotLocationString + ".itemstack.display", shopItem.getItemStack());
-
             configuration.set("shop.contents." + slotLocationString + ".itemstack.contents", shopItem.getContents());
-
-            shopItem.getMessagesOptional()
-                    .ifPresent(list -> configuration.set("shop.contents." + slotLocationString + ".messages", list));
-            shopItem.getPermissionOptional().ifPresent(
-                    permission -> configuration.set("shop.contents." + slotLocationString + ".permission", permission));
+            configuration.set("shop.contents." + slotLocationString + ".messages", shopItem.getMessages());
+            configuration.set("shop.contents." + slotLocationString + ".permission", shopItem.getPermission());
+            configuration.set("shop.contents." + slotLocationString + ".commands", shopItem.getCommands());
         });
 
         try {

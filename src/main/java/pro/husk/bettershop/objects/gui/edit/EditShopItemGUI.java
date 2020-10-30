@@ -16,7 +16,7 @@ import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 
-import java.util.Optional;
+import java.util.List;
 
 public class EditShopItemGUI implements CommonGUI {
 
@@ -64,35 +64,44 @@ public class EditShopItemGUI implements CommonGUI {
         ItemStack editContentsItem = ItemBuilder.builder(Material.CHEST).name(ChatColor.GREEN + "Item inventory")
                 .addLore(ChatColor.GOLD + "Edit item's inventory").build();
 
-        ItemBuilder.Builder editMessagesItemBuilder = ItemBuilder.builder(Material.PAPER).name(ChatColor.GOLD + "Messages")
-                .addLore(ChatColor.YELLOW + "Manage the messages your item sends");
+        ItemBuilder.Builder editMessagesItemBuilder = ItemBuilder.builder(Material.PAPER)
+                .name(ChatColor.GOLD + "Messages").addLore(ChatColor.YELLOW + "Manage the messages your item sends");
 
-        // Add the messages in the item's lore if present
-        if (shopItem.getMessagesOptional().isPresent()) {
+        ItemBuilder.Builder editCommandItemBuilder = ItemBuilder.builder(Material.WRITTEN_BOOK)
+                .name(ChatColor.GOLD + "Commands").addLore(ChatColor.YELLOW + "Add commands to run when users buy this item");
+
+        // Add messages to the lore if present
+        List<String> messages = shopItem.getMessages();
+        if (messages != null) {
             editMessagesItemBuilder.addLore("");
+            messages.forEach(editMessagesItemBuilder::addLore);
+        }
 
-            shopItem.getMessagesOptional().get().forEach(editMessagesItemBuilder::addLore);
+        // Add commands to the lore if present
+        List<String> commands = shopItem.getCommands();
+        if (commands != null) {
+            editCommandItemBuilder.addLore("");
+            commands.forEach(editCommandItemBuilder::addLore);
         }
 
         ItemStack editMessagesItem = editMessagesItemBuilder.build();
-
-        ItemBuilder.Builder editPermissionsItemBuilder = ItemBuilder.builder(Material.BARRIER).name(ChatColor.GOLD + "Permissions")
+        ItemBuilder.Builder editPermissionsItemBuilder = ItemBuilder.builder(Material.BARRIER)
+                .name(ChatColor.GOLD + "Permissions")
                 .addLore(ChatColor.YELLOW + "Users with this permission will see the item in the shop");
 
-        // Add the messages in the item's lore if present
-        if (shopItem.getPermissionOptional().isPresent()) {
+        // Add the permission in the item's lore if present
+        String permission = shopItem.getPermission();
+        if (permission != null) {
             editMessagesItemBuilder.addLore("");
-            editMessagesItemBuilder.addLore(ChatColor.GREEN + shopItem.getPermissionOptional().get());
+            editMessagesItemBuilder.addLore(ChatColor.GREEN + permission);
         }
 
         ItemStack editPermissionsItem = editPermissionsItemBuilder.build();
-
         ItemStack editVisibilityItem = ItemBuilder.builder(Material.GLASS).name(ChatColor.GREEN + "Change visibility")
                 .addLore(ChatColor.WHITE + "Visibility: " + ChatColor.YELLOW + shopItem.getVisibility()).build();
 
         // Build GuiItem of each of the ItemStacks
         GuiItem displayGuiItem = new GuiItem(displayItem, event -> event.setCancelled(true));
-
         GuiItem editDisplayGuiItem = new GuiItem(editDisplayItem, event -> {
             Gui editDisplay = new EditDisplayItemGUI(shopItem, this).getGui();
             editDisplay.show(event.getWhoClicked());
@@ -146,10 +155,21 @@ public class EditShopItemGUI implements CommonGUI {
             player.closeInventory();
 
             PlayerChatInput.addWaitingOnInput(player, callback -> {
-                shopItem.setPermissionOptional(Optional.of(callback));
+                shopItem.setPermission(callback);
                 PlayerChatInput.removeWaitingOnInput(player);
                 this.show(player);
             }, "Please input the permission node you want users to be able to see this item in the shop");
+        });
+
+        GuiItem editCommandsGuiItem = new GuiItem(editCommandItemBuilder.build(), event -> {
+            Player player = (Player) event.getWhoClicked();
+            player.closeInventory();
+
+            PlayerChatInput.addWaitingOnInput(player, callback -> {
+                shopItem.addCommand(callback);
+                PlayerChatInput.removeWaitingOnInput(player);
+                this.show(player);
+            }, "Please input the command you wish to run");
         });
 
         GuiItem editVisibilityGuiItem = new GuiItem(editVisibilityItem, event -> {
@@ -166,6 +186,7 @@ public class EditShopItemGUI implements CommonGUI {
         SlotLocation editContentsSlot = SlotLocation.fromSlotNumber(19, pane.getLength());
         SlotLocation editMessagesSlot = SlotLocation.fromSlotNumber(8, pane.getLength());
         SlotLocation editPermissionsSlot = SlotLocation.fromSlotNumber(15, pane.getLength());
+        SlotLocation editCommandsSlot = SlotLocation.fromSlotNumber(16, pane.getLength());
         SlotLocation editVisiblitySlot = SlotLocation.fromSlotNumber(10, pane.getLength());
         SlotLocation backButtonSlot = SlotLocation.fromSlotNumber(22, pane.getLength());
 
@@ -189,6 +210,7 @@ public class EditShopItemGUI implements CommonGUI {
             pane.addItem(editContentsGuiItem, editContentsSlot.getX(), editContentsSlot.getY());
         } else if (function == ShopFunction.COMMAND) {
             pane.addItem(editBuyCostGuiItem, editBuyCostSlot.getX(), editBuyCostSlot.getY());
+            pane.addItem(editCommandsGuiItem, editCommandsSlot.getX(), editCommandsSlot.getY());
         }
 
         ItemStack filler = ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name("").build();
