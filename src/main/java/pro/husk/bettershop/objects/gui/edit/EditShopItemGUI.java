@@ -1,5 +1,7 @@
 package pro.husk.bettershop.objects.gui.edit;
 
+import java.util.Optional;
+
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
@@ -82,6 +84,17 @@ public class EditShopItemGUI implements CommonGUI {
 
         ItemStack editMessagesItem = editMessagesItemBuilder.getItemStack();
 
+        ItemBuilder editPermissionsItemBuilder = new ItemBuilder(Material.BARRIER).setName(ChatColor.GOLD + "Permissions")
+                .addLore(ChatColor.YELLOW + "Users with this permission will see the item in the shop");
+
+        // Add the messages in the item's lore if present
+        if (shopItem.getPermissionOptional().isPresent()) {
+            editMessagesItemBuilder.addLore("");
+            editMessagesItemBuilder.addLore(ChatColor.GREEN + shopItem.getPermissionOptional().get());
+        }
+
+        ItemStack editPermissionsItem = editMessagesItemBuilder.getItemStack();
+
         ItemStack editVisibilityItem = new ItemBuilder(Material.GLASS).setName(ChatColor.GREEN + "Change visibility")
                 .addLore(ChatColor.WHITE + "Visibility: " + ChatColor.YELLOW + shopItem.getVisibility()).getItemStack();
 
@@ -136,6 +149,17 @@ public class EditShopItemGUI implements CommonGUI {
             }, "Please input the new message");
         });
 
+        GuiItem editPermissionsGuiItem = new GuiItem(editPermissionsItem, event -> {
+            Player player = (Player) event.getWhoClicked();
+            player.closeInventory();
+
+            PlayerChatInput.addWaitingOnInput(player, callback -> {
+                shopItem.setPermissionOptional(Optional.of(callback));
+                PlayerChatInput.removeWaitingOnInput(player);
+                this.show(player);
+            }, "Please input the permission node you want users to be able to see this item in the shop");
+        });
+
         GuiItem editVisibilityGuiItem = new GuiItem(editVisibilityItem, event -> {
             Gui editVisibility = new EditShopItemVisibility(shopItem, this).getGui();
             editVisibility.show(event.getWhoClicked());
@@ -149,6 +173,7 @@ public class EditShopItemGUI implements CommonGUI {
         SlotLocation editSellCostSlot = SlotLocation.fromSlotNumber(18, pane.getLength());
         SlotLocation editContentsSlot = SlotLocation.fromSlotNumber(19, pane.getLength());
         SlotLocation editMessagesSlot = SlotLocation.fromSlotNumber(8, pane.getLength());
+        SlotLocation editPermissionsSlot = SlotLocation.fromSlotNumber(15, pane.getLength());
         SlotLocation editVisiblitySlot = SlotLocation.fromSlotNumber(10, pane.getLength());
         SlotLocation backButtonSlot = SlotLocation.fromSlotNumber(22, pane.getLength());
 
@@ -157,6 +182,7 @@ public class EditShopItemGUI implements CommonGUI {
         pane.addItem(editDisplayGuiItem, editDisplaySlot.getX(), editDisplaySlot.getY());
         pane.addItem(editFunctionGuiItem, editFunctionSlot.getX(), editFunctionSlot.getY());
         pane.addItem(editMessagesGuiItem, editMessagesSlot.getX(), editMessagesSlot.getY());
+        pane.addItem(editPermissionsGuiItem, editPermissionsSlot.getX(), editPermissionsSlot.getY());
         pane.addItem(editVisibilityGuiItem, editVisiblitySlot.getX(), editVisiblitySlot.getY());
         pane.addItem(MenuHelper.getBackButton(backGui), backButtonSlot.getX(), backButtonSlot.getY());
 
