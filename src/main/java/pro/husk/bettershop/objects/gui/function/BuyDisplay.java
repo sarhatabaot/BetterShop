@@ -177,7 +177,7 @@ public class BuyDisplay implements CommonGUI {
             }
 
             List<String> messages = shopItem.getMessages();
-            if (messages != null) {
+            if (messages != null && messages.size() != 0) {
                 messages.forEach(player::sendMessage);
             } else {
                 player.sendMessage(ChatColor.GREEN + "You have purchased " + ChatColor.AQUA + amount + ChatColor.WHITE

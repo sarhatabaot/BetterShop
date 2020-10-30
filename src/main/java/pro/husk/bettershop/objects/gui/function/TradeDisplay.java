@@ -42,8 +42,7 @@ public class TradeDisplay implements CommonGUI {
 
     private void renderMenu(ShopItem shopItem, StaticPane pane, CommonGUI backGui) {
         ItemStack displayItem = shopItem.getItemStack().clone();
-        ItemStack confirmItem = ItemBuilder.builder(Material.GREEN_STAINED_GLASS_PANE)
-                .name(ChatColor.GREEN + "Confirm")
+        ItemStack confirmItem = ItemBuilder.builder(Material.GREEN_STAINED_GLASS_PANE).name(ChatColor.GREEN + "Confirm")
                 .addLore(ChatColor.GOLD + "Click me to confirm the trade").build();
 
         ItemStack filler = ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name("").build();
@@ -107,10 +106,11 @@ public class TradeDisplay implements CommonGUI {
             }
 
             List<String> messages = shopItem.getMessages();
-            if (messages != null) {
+            if (messages != null && messages.size() != 0) {
                 messages.forEach(player::sendMessage);
             } else {
-                player.sendMessage(ChatColor.GREEN + "You have traded for " + ChatColor.AQUA + shopItem.getItemStack().getAmount() + shopItem.getItemStackName());
+                player.sendMessage(ChatColor.GREEN + "You have traded for " + ChatColor.AQUA
+                        + shopItem.getItemStack().getAmount() + shopItem.getItemStackName());
             }
         } else {
             event.setCancelled(true);

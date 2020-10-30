@@ -1,6 +1,5 @@
 package pro.husk.bettershop.util;
 
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -105,7 +104,6 @@ public class ItemBuilder {
                     lore(itemMeta.getLore());
                 }
             }
-
         }
 
         public void addNameToLoreIfSetOnArgument(ItemStack argument) {
@@ -113,7 +111,7 @@ public class ItemBuilder {
 
             if (itemMeta != null) {
                 if (itemMeta.hasDisplayName()) {
-                    addLore(ChatColor.WHITE + itemMeta.getDisplayName());
+                    addLore(itemMeta.getDisplayName());
                 }
             }
         }

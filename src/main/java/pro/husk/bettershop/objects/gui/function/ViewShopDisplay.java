@@ -1,10 +1,14 @@
 package pro.husk.bettershop.objects.gui.function;
 
+import java.util.List;
+
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,9 +35,7 @@ public class ViewShopDisplay implements CommonGUI {
 
         forceRefreshGUI();
 
-        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
-
-        gui.setOnBottomClick(click -> click.setCancelled(true));
+        gui.setOnGlobalClick(click -> click.setCancelled(true));
 
         gui.addPane(pane);
     }
@@ -68,8 +70,6 @@ public class ViewShopDisplay implements CommonGUI {
             new TradeDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.COMMAND) {
             processCommandSale(player, shopItem);
-        } else if (function == ShopFunction.NONE) {
-            event.setCancelled(true);
         }
     }
 
@@ -78,6 +78,22 @@ public class ViewShopDisplay implements CommonGUI {
 
         if (balance >= shopItem.getBuyCost()) {
             TransactionUtil.deduct(player, shopItem.getBuyCost());
+
+            // Run all the commands
+            shopItem.getCommands().forEach(command -> {
+                String parsed = command.replaceAll("%p", player.getName());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsed);
+            });
+
+            List<String> messages = shopItem.getMessages();
+            if (messages != null && messages.size() != 0) {
+                messages.forEach(player::sendMessage);
+            } else {
+                player.sendMessage(ChatColor.GREEN + "You just bought a command for " + ChatColor.DARK_GREEN + "$"
+                        + shopItem.getBuyCost());
+            }
+
+            player.closeInventory();
         }
     }
 

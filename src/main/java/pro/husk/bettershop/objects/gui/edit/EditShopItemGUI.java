@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.events.PlayerChatInput;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
+import pro.husk.bettershop.objects.Visibility;
 import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
@@ -34,17 +35,15 @@ public class EditShopItemGUI implements CommonGUI {
 
         forceRefreshGUI();
 
-        // Disable outside clicks
-        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
-
-        // Disable bottom clicks
-        gui.setOnBottomClick(onBottomClick -> onBottomClick.setCancelled(true));
+        gui.setOnGlobalClick(click -> {
+            click.setCancelled(true);
+        });
 
         gui.addPane(pane);
     }
 
     private void renderItems(StaticPane pane, CommonGUI backGui) {
-        ItemStack displayItem = shopItem.getItemStack();
+        ItemStack displayItem = shopItem.getItemStack().clone();
 
         // Build all ItemStacks of our items
         ItemStack editDisplayItem = ItemBuilder.builder(Material.BOOK).name(ChatColor.GOLD + "Item display")
@@ -196,7 +195,6 @@ public class EditShopItemGUI implements CommonGUI {
         pane.addItem(editDisplayGuiItem, editDisplaySlot.getX(), editDisplaySlot.getY());
         pane.addItem(editFunctionGuiItem, editFunctionSlot.getX(), editFunctionSlot.getY());
         pane.addItem(editMessagesGuiItem, editMessagesSlot.getX(), editMessagesSlot.getY());
-        pane.addItem(editPermissionsGuiItem, editPermissionsSlot.getX(), editPermissionsSlot.getY());
         pane.addItem(editVisibilityGuiItem, editVisiblitySlot.getX(), editVisiblitySlot.getY());
         pane.addItem(MenuHelper.getBackButton(backGui), backButtonSlot.getX(), backButtonSlot.getY());
 
@@ -214,12 +212,17 @@ public class EditShopItemGUI implements CommonGUI {
             pane.addItem(editCommandsGuiItem, editCommandsSlot.getX(), editCommandsSlot.getY());
         }
 
+        if (shopItem.getVisibility() == Visibility.PERMISSION) {
+            pane.addItem(editPermissionsGuiItem, editPermissionsSlot.getX(), editPermissionsSlot.getY());
+        }
+
         ItemStack filler = ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name("").build();
         pane.fillWith(filler);
     }
 
     @Override
     public void forceRefreshGUI() {
+        pane.clear();
         renderItems(pane, backGui);
     }
 }

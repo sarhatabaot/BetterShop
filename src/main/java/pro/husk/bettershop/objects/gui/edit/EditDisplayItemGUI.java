@@ -5,6 +5,8 @@ import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -32,11 +34,7 @@ public class EditDisplayItemGUI implements CommonGUI {
 
         forceRefreshGUI();
 
-        // Disable outside clicks
-        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
-
-        // Disable bottom clicks
-        gui.setOnBottomClick(onBottomClick -> onBottomClick.setCancelled(true));
+        gui.setOnGlobalClick(click -> click.setCancelled(true));
 
         gui.addPane(pane);
     }
@@ -83,6 +81,8 @@ public class EditDisplayItemGUI implements CommonGUI {
                 }, "Please enter a single line of lore you want");
             } else if (event.getClick() == ClickType.RIGHT) {
                 shopItem.setItemStack(ItemBuilder.builder(shopItemStack).removeLore().build());
+                forceRefreshGUI();
+                gui.show(player);
             }
         });
 
@@ -115,6 +115,7 @@ public class EditDisplayItemGUI implements CommonGUI {
 
     @Override
     public void forceRefreshGUI() {
+        pane.clear();
         renderItems(pane, backGui);
     }
 }

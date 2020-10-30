@@ -49,6 +49,10 @@ public final class BetterShop extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Save all shops on shutdown
+        Shop.getShopHashMap().forEach((name, shop) -> {
+            shop.saveToConfig();
+        });
         paperCommandManager.unregisterCommands();
     }
 

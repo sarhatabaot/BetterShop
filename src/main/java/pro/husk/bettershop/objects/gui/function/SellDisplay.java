@@ -51,27 +51,33 @@ public class SellDisplay implements CommonGUI {
 
         ItemStack plus1 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+1").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-1")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
 
         ItemStack plus8 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+8").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-8")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
 
         ItemStack plus16 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+16").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-16")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
 
         ItemStack plus32 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+32").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-32")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
 
         ItemStack plus64 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+64").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-64")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
 
         ItemStack plus128 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+128").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-128")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
 
         ItemStack displayItem = shopItem.getItemStack().clone();
         ItemMeta itemMeta = displayItem.getItemMeta();
@@ -169,14 +175,15 @@ public class SellDisplay implements CommonGUI {
             TransactionUtil.add(player, amount);
 
             List<String> messages = shopItem.getMessages();
-            if (messages != null) {
+            if (messages != null && messages.size() != 0) {
                 messages.forEach(player::sendMessage);
             } else {
-                player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.AQUA + amount + ChatColor.WHITE
-                        + " " + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
+                player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.AQUA + amount + ChatColor.WHITE + " "
+                        + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
                         + reward);
 
-                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + TransactionUtil.getBalance(player));
+                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$"
+                        + TransactionUtil.getBalance(player));
             }
             player.closeInventory();
         }
