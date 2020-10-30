@@ -23,14 +23,15 @@ public class EditDisplayItemGUI implements CommonGUI {
     private Gui gui;
     private ShopItem shopItem;
     private StaticPane pane;
-    private Gui backGui;
+    private CommonGUI backGui;
 
-    public EditDisplayItemGUI(ShopItem shopItem, Gui backGui) {
+    public EditDisplayItemGUI(ShopItem shopItem, CommonGUI backGui) {
         this.shopItem = shopItem;
         this.gui = new Gui(1, ChatColor.GOLD + "Edit display item:");
         this.backGui = backGui;
         this.pane = new StaticPane(0, 0, 9, 1);
-        renderItems(pane, backGui);
+
+        forceRefreshGUI();
 
         // Disable outside clicks
         gui.setOnOutsideClick(onOutsideClick -> {
@@ -45,7 +46,7 @@ public class EditDisplayItemGUI implements CommonGUI {
         gui.addPane(pane);
     }
 
-    private void renderItems(StaticPane pane, Gui backGui) {
+    private void renderItems(StaticPane pane, CommonGUI backGui) {
         ItemBuilder nameItemBuilder = new ItemBuilder(Material.NAME_TAG)
                 .setName(ChatColor.GREEN + "Change display name");
 
@@ -112,7 +113,7 @@ public class EditDisplayItemGUI implements CommonGUI {
         pane.addItem(nameItem, nameSlot.getX(), nameSlot.getY());
         pane.addItem(loreItem, loreSlot.getX(), loreSlot.getY());
         pane.addItem(amountItem, amountSlot.getX(), amountSlot.getY());
-        pane.addItem(MenuHelper.getBackButton(this), backSlot.getX(), backSlot.getY());
+        pane.addItem(MenuHelper.getBackButton(backGui), backSlot.getX(), backSlot.getY());
     }
 
     @Override

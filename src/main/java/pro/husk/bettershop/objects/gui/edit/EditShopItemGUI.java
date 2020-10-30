@@ -102,7 +102,7 @@ public class EditShopItemGUI implements CommonGUI {
         GuiItem displayGuiItem = new GuiItem(displayItem, event -> event.setCancelled(true));
 
         GuiItem editDisplayGuiItem = new GuiItem(editDisplayItem, event -> {
-            Gui editDisplay = new EditDisplayItemGUI(shopItem, gui).getGui();
+            Gui editDisplay = new EditDisplayItemGUI(shopItem, this).getGui();
             editDisplay.show(event.getWhoClicked());
         });
 

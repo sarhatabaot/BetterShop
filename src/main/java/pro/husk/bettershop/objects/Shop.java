@@ -6,6 +6,7 @@ import co.aikar.commands.contexts.ContextResolver;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import pro.husk.bettershop.BetterShop;
+import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.objects.gui.edit.EditShopDisplay;
 import pro.husk.bettershop.objects.gui.function.ViewShopDisplay;
 import pro.husk.bettershop.util.SlotLocation;
@@ -54,11 +55,12 @@ public class Shop {
 
     public void editShop(Player player) {
         editingMap.put(player.getUniqueId(), this);
-        Gui gui = new EditShopDisplay(this).getGui();
+        CommonGUI gui = new EditShopDisplay(this);
 
-        gui.setOnClose(close -> {
+        gui.getGui().setOnClose(close -> {
             BetterShop.info("Saving shop: " + name);
             saveToConfig();
+            removeEditor(player);
         });
 
         gui.show(player);
@@ -66,14 +68,15 @@ public class Shop {
 
     public void open(Player player) {
         if (!isBeingEdited()) {
-            new ViewShopDisplay(this, player).show(player);
+            new ViewShopDisplay(this, player).getGui().show(player);
         } else {
             player.sendMessage(ChatColor.RED + "This shop is still being edited...");
         }
     }
 
-    public static Shop loadShop(YamlConfiguration configuration) {
-        Shop shop = new Shop(configuration.getName().replaceAll(".yml", ""), configuration);
+    public static Shop loadShop(File shopFile) {
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(shopFile);
+        Shop shop = new Shop(shopFile.getName().replaceAll(".yml", ""), configuration);
 
         ConfigurationSection section = configuration.getConfigurationSection("shop.contents");
         section.getKeys(false).forEach(key -> {
@@ -82,10 +85,10 @@ public class Shop {
             double sellCost = section.getDouble(key + ".sell_cost");
             String visibilityString = section.getString(key + ".visibility");
             int cooldown = section.getInt(key + ".cooldown");
-            ItemStack itemStack = section.getItemStack(key + ".itemstack");
+            ItemStack itemStack = section.getItemStack(key + ".itemstack.display");
             List<ItemStack> itemStackContents = (List<ItemStack>) section.getList(key + ".itemstack.contents");
-            Optional<List<String>> messagesOptional = Optional.of(section.getStringList(key + ".messages"));
-            Optional<String> permissionOptional = Optional.of(section.getString(key + ".permission"));
+            Optional<List<String>> messagesOptional = Optional.ofNullable(section.getStringList(key + ".messages"));
+            Optional<String> permissionOptional = Optional.ofNullable(section.getString(key + ".permission"));
 
             ShopFunction function = ShopFunction.valueOf(functionString);
             Visibility visibility = Visibility.valueOf(visibilityString);
@@ -95,6 +98,8 @@ public class Shop {
                     permissionOptional, messagesOptional, itemStackContents);
 
             shop.getContentsMap().put(slotLocation, shopItem);
+
+            BetterShop.info("Finished loading item");
         });
 
         BetterShop.info("Finished loading shop '" + shop.getName() + "'!");
@@ -103,27 +108,21 @@ public class Shop {
     }
 
     public void saveToConfig() {
+        File file = new File(BetterShop.getInstance().getDataFolder() + "/Shops/" + name + ".yml");
         if (configuration == null) {
-            File file = new File(BetterShop.getInstance().getDataFolder() + "/Shops/" + name + ".yml");
             configuration = YamlConfiguration.loadConfiguration(file);
             configuration.options().header("~ BetterShop - Shop Configuration ~");
-
-            try {
-                configuration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         contentsMap.forEach((slotLocation, shopItem) -> {
             String slotLocationString = slotLocation.toString();
 
-            configuration.set("shop.contents." + slotLocationString + ".function", shopItem.getShopFunction());
+            configuration.set("shop.contents." + slotLocationString + ".function", shopItem.getShopFunction().name());
             configuration.set("shop.contents." + slotLocationString + ".buy_cost", shopItem.getBuyCost());
             configuration.set("shop.contents." + slotLocationString + ".sell_cost", shopItem.getSellCost());
-            configuration.set("shop.contents." + slotLocationString + ".visibility", shopItem.getVisibility());
+            configuration.set("shop.contents." + slotLocationString + ".visibility", shopItem.getVisibility().name());
             configuration.set("shop.contents." + slotLocationString + ".cooldown", shopItem.getCooldownSeconds());
-            configuration.set("shop.contents." + slotLocationString + ".itemstack",
+            configuration.set("shop.contents." + slotLocationString + ".itemstack.display",
                     shopItem.getItemBuilder().getItemStack());
 
             configuration.set("shop.contents." + slotLocationString + ".itemstack.contents", shopItem.getContents());
@@ -136,6 +135,12 @@ public class Shop {
                 configuration.set("shop.contents." + slotLocationString + ".permission", permission);
             });
         });
+
+        try {
+            configuration.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static ContextResolver<Shop, BukkitCommandExecutionContext> getContextResolver() {

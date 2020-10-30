@@ -57,7 +57,7 @@ public class ViewShopDisplay implements CommonGUI {
                     || (isSome && !viewer.hasPermission(permissionOptional.get())));
 
             if (!hideItem) {
-                ItemStack itemStack = shopItem.getItemBuilder().getItemStack();
+                ItemStack itemStack = shopItem.getDisplayItem();
 
                 GuiItem guiItem = new GuiItem(itemStack, event -> {
                     handleItemClick(event, shopItem);
@@ -69,16 +69,19 @@ public class ViewShopDisplay implements CommonGUI {
     }
 
     private void handleItemClick(InventoryClickEvent event, ShopItem shopItem) {
+        Player player = (Player) event.getWhoClicked();
         ShopFunction function = shopItem.getShopFunction();
 
         if (function == ShopFunction.BUY) {
-
+            new BuyDisplay(shopItem, player).show(player);
         } else if (function == ShopFunction.SELL) {
 
         } else if (function == ShopFunction.TRADE) {
 
         } else if (function == ShopFunction.COMMAND) {
 
+        } else if (function == ShopFunction.NONE) {
+            event.setCancelled(true);
         }
     }
 

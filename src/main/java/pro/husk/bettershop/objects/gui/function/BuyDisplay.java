@@ -53,55 +53,59 @@ public class BuyDisplay implements CommonGUI {
     private void renderMenu(ShopItem shopItem, StaticPane pane, Player viewer) {
         double cost = amount * shopItem.getBuyCost();
 
-        ItemBuilder plusItem = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE);
+        ItemBuilder plusItem = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE);
 
         ItemStack plus1 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+1").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-1")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
 
         ItemStack plus8 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+8").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-8")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
 
         ItemStack plus16 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+16").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-16")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
 
         ItemStack plus32 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+32").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-32")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
 
         ItemStack plus64 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+64").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-64")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
 
         ItemStack plus128 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+128").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-128")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
 
         ItemStack displayItem = shopItem.getItemBuilder()
                 .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost)
-                .addLore("", ChatColor.DARK_GREEN + "Click to buy").getItemStack();
+                .addLore("", ChatColor.DARK_GREEN + "Click to buy").getItemStack().clone();
 
         GuiItem backButton = MenuHelper.getBackButton(this);
 
         GuiItem displayGuiItem = new GuiItem(displayItem, event -> {
             handlePurchase(event, shopItem, amount, cost);
+            event.setCancelled(true);
         });
 
         GuiItem plus1GuiItem = new GuiItem(plus1, event -> {
             amount += 1;
             forceRefreshGUI();
+            event.setCancelled(true);
         });
 
         GuiItem plus8GuiItem = new GuiItem(plus8, event -> {
             amount += 8;
             forceRefreshGUI();
+            event.setCancelled(true);
         });
 
         GuiItem plus16GuiItem = new GuiItem(plus16, event -> {
             amount += 16;
             forceRefreshGUI();
+            event.setCancelled(true);
         });
 
         GuiItem plus32GuiItem = new GuiItem(plus32, event -> {
@@ -112,11 +116,13 @@ public class BuyDisplay implements CommonGUI {
         GuiItem plus64GuiItem = new GuiItem(plus64, event -> {
             amount += 64;
             forceRefreshGUI();
+            event.setCancelled(true);
         });
 
         GuiItem plus128GuiItem = new GuiItem(plus128, event -> {
             amount += 128;
             forceRefreshGUI();
+            event.setCancelled(true);
         });
 
         // Get the respective locations

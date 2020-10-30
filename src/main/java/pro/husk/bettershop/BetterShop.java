@@ -80,10 +80,12 @@ public final class BetterShop extends JavaPlugin {
         } else {
             if (shopFiles.isDirectory()) {
                 for (File shopFile : shopFiles.listFiles()) {
-                    if (Shop.loadShop(YamlConfiguration.loadConfiguration(shopFile)) != null) {
-                        info("Loaded shop: " + shopFile.getName());
-                    } else {
-                        info("Error loading shop: " + shopFile.getName());
+                    if (shopFile.getName().endsWith(".yml")) {
+                        if (Shop.loadShop(shopFile) != null) {
+                            info("Loaded shop: " + shopFile.getName());
+                        } else {
+                            info("Error loading shop: " + shopFile.getName());
+                        }
                     }
                 }
             }
