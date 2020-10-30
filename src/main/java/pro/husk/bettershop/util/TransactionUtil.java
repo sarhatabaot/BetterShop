@@ -68,6 +68,36 @@ public final class TransactionUtil {
         return sameType && sameData && sameHasItemMeta && sameEnchantments && sameItemMeta;
     }
 
+    public static void removeCustomItem(Player player, ItemStack item) {
+        int amountToRemove = item.getAmount();
+
+        for (ItemStack search : player.getInventory()) {
+            if (amountToRemove != 0) {
+                if (search != null) {
+                    if (itemEquals(search, item)) {
+                        int searchAmount = search.getAmount();
+
+                        if (amountToRemove - searchAmount == 0) {
+                            player.getInventory().removeItem(search);
+                            amountToRemove = 0;
+                        } else if (amountToRemove - searchAmount > 0) {
+                            amountToRemove = amountToRemove - searchAmount;
+                            player.getInventory().removeItem(search);
+                        } else if (amountToRemove - searchAmount < 0) {
+                            ItemStack readd = search.clone();
+                            player.getInventory().removeItem(search);
+
+                            readd.setAmount(searchAmount - amountToRemove);
+                            player.getInventory().addItem(readd);
+
+                            amountToRemove = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void deduct(Player player, int amount) {
         BetterShop.getEconomy().withdrawPlayer(player, amount);
     }

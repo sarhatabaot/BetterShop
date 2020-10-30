@@ -19,10 +19,9 @@ import pro.husk.bettershop.util.SlotLocation;
 import pro.husk.bettershop.util.TransactionUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class BuyDisplay implements CommonGUI {
+public class SellDisplay implements CommonGUI {
 
     @Getter
     private final Gui gui;
@@ -31,9 +30,9 @@ public class BuyDisplay implements CommonGUI {
     private final CommonGUI backGui;
     private int amount;
 
-    public BuyDisplay(ShopItem shopItem, CommonGUI backGui) {
+    public SellDisplay(ShopItem shopItem, CommonGUI backGui) {
         this.shopItem = shopItem;
-        this.gui = new Gui(6, ChatColor.GOLD + "Buy item:");
+        this.gui = new Gui(6, ChatColor.GOLD + "Sell item:");
         this.backGui = backGui;
         this.pane = new StaticPane(0, 0, 9, 6);
         this.amount = 0;
@@ -46,33 +45,33 @@ public class BuyDisplay implements CommonGUI {
     }
 
     private void renderMenu(ShopItem shopItem, StaticPane pane, CommonGUI backGui) {
-        double cost = amount * shopItem.getBuyCost();
+        double reward = amount * shopItem.getSellCost();
 
         ItemBuilder.Builder plusItem = ItemBuilder.builder(Material.GREEN_STAINED_GLASS_PANE);
 
         ItemStack plus1 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+1").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-1")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
 
         ItemStack plus8 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+8").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-8")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
 
         ItemStack plus16 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+16").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-16")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
 
         ItemStack plus32 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+32").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-32")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
 
         ItemStack plus64 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+64").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-64")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
 
         ItemStack plus128 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+128").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-128")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward).build();
 
         ItemStack displayItem = shopItem.getItemStack().clone();
         ItemMeta itemMeta = displayItem.getItemMeta();
@@ -84,14 +83,14 @@ public class BuyDisplay implements CommonGUI {
 
         lore.add("");
         lore.add(ChatColor.BLUE + "Amount: " + amount);
-        lore.add(ChatColor.GREEN + "Price: " + cost);
+        lore.add(ChatColor.GREEN + "You will receive: " + reward);
 
         itemMeta.setLore(lore);
         displayItem.setItemMeta(itemMeta);
 
         GuiItem backButton = MenuHelper.getBackButton(backGui);
 
-        GuiItem displayGuiItem = new GuiItem(displayItem, event -> handlePurchase(event, shopItem, amount, cost));
+        GuiItem displayGuiItem = new GuiItem(displayItem, event -> handleSell(event, shopItem, amount, reward));
 
         GuiItem plus1GuiItem = new GuiItem(plus1, event -> {
             handleClick(event, 1);
@@ -160,33 +159,25 @@ public class BuyDisplay implements CommonGUI {
         }
     }
 
-    private void handlePurchase(InventoryClickEvent event, ShopItem shopItem, int amount, double cost) {
+    private void handleSell(InventoryClickEvent event, ShopItem shopItem, int amount, double reward) {
         Player player = (Player) event.getWhoClicked();
 
-        ItemStack itemStack = shopItem.getItemStack().clone();
-        itemStack.setAmount(amount);
+        ItemStack itemStack = shopItem.getItemStack();
 
-        double balance = TransactionUtil.getBalance(player);
-
-        if (balance >= cost) {
-            TransactionUtil.deduct(player, amount);
-
-            HashMap<Integer, ItemStack> failedItems = player.getInventory().addItem(itemStack);
-            if (!failedItems.isEmpty()) {
-                player.getLocation().getWorld().dropItemNaturally(player.getLocation(), itemStack);
-            }
+        if (TransactionUtil.getContainsAmount(player, itemStack) >= amount) {
+            TransactionUtil.removeCustomItem(player, itemStack);
+            TransactionUtil.add(player, amount);
 
             List<String> messages = shopItem.getMessagesOptional().get();
             if (messages.size() != 0) {
                 messages.forEach(player::sendMessage);
             } else {
-                player.sendMessage(ChatColor.GREEN + "You have purchased " + ChatColor.AQUA + amount + ChatColor.WHITE
+                player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.AQUA + amount + ChatColor.WHITE
                         + " " + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
-                        + cost);
+                        + reward);
 
-                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + balance);
+                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + TransactionUtil.getBalance(player));
             }
-
             player.closeInventory();
         }
     }
