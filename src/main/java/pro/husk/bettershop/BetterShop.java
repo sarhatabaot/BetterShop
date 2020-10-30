@@ -3,7 +3,6 @@ package pro.husk.bettershop;
 import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -72,7 +71,7 @@ public final class BetterShop extends JavaPlugin {
     }
 
     private void loadShops() {
-        File shopFiles = new File(getDataFolder().getPath() + "/shops/");
+        File shopFiles = new File(getDataFolder().getPath() + "/Shops/");
 
         if (!shopFiles.exists()) {
             if (!shopFiles.mkdirs()) {

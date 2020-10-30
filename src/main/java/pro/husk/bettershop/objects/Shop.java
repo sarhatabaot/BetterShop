@@ -4,13 +4,25 @@ import co.aikar.commands.BukkitCommandExecutionContext;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.contexts.ContextResolver;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+import pro.husk.bettershop.BetterShop;
 import pro.husk.bettershop.objects.gui.edit.EditShopDisplay;
+import pro.husk.bettershop.objects.gui.function.ViewShopDisplay;
 import pro.husk.bettershop.util.SlotLocation;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import com.github.stefvanschie.inventoryframework.Gui;
 
 public class Shop {
 
@@ -18,37 +30,112 @@ public class Shop {
     private static final HashMap<String, Shop> shopHashMap = new HashMap<>();
 
     @Getter
-    private final String name;
+    private static final HashMap<UUID, Shop> editingMap = new HashMap<>();
 
     @Getter
-    private final int rows;
+    private final String name;
 
     @Getter
     private final HashMap<SlotLocation, ShopItem> contentsMap;
 
+    private YamlConfiguration configuration;
+
     public Shop(String name) {
-        this(name, Config.getDefaultShopRows());
+        this(name, null);
     }
 
-    public Shop(String name, int rows) {
+    public Shop(String name, YamlConfiguration configuration) {
         this.name = name;
-        this.rows = rows;
         this.contentsMap = new HashMap<>();
+        this.configuration = configuration;
 
         shopHashMap.put(name, this);
     }
 
     public void editShop(Player player) {
-        ShopManager.getEditingMap().put(player.getUniqueId(), this);
-        new EditShopDisplay(this).getGui().show(player);
+        editingMap.put(player.getUniqueId(), this);
+        Gui gui = new EditShopDisplay(this).getGui();
+
+        gui.setOnClose(close -> {
+            BetterShop.info("Saving shop: " + name);
+            saveToConfig();
+        });
+
+        gui.show(player);
     }
 
     public void open(Player player) {
-
+        if (!isBeingEdited()) {
+            new ViewShopDisplay(this, player).show(player);
+        } else {
+            player.sendMessage(ChatColor.RED + "This shop is still being edited...");
+        }
     }
 
     public static Shop loadShop(YamlConfiguration configuration) {
-        return null;
+        Shop shop = new Shop(configuration.getName().replaceAll(".yml", ""), configuration);
+
+        ConfigurationSection section = configuration.getConfigurationSection("shop.contents");
+        section.getKeys(false).forEach(key -> {
+            String functionString = section.getString(key + ".function");
+            double buyCost = section.getDouble(key + ".buy_cost");
+            double sellCost = section.getDouble(key + ".sell_cost");
+            String visibilityString = section.getString(key + ".visibility");
+            int cooldown = section.getInt(key + ".cooldown");
+            ItemStack itemStack = section.getItemStack(key + ".itemstack");
+            List<ItemStack> itemStackContents = (List<ItemStack>) section.getList(key + ".itemstack.contents");
+            Optional<List<String>> messagesOptional = Optional.of(section.getStringList(key + ".messages"));
+            Optional<String> permissionOptional = Optional.of(section.getString(key + ".permission"));
+
+            ShopFunction function = ShopFunction.valueOf(functionString);
+            Visibility visibility = Visibility.valueOf(visibilityString);
+
+            SlotLocation slotLocation = SlotLocation.fromString(key);
+            ShopItem shopItem = new ShopItem(itemStack, function, buyCost, sellCost, cooldown, visibility,
+                    permissionOptional, messagesOptional, itemStackContents);
+
+            shop.getContentsMap().put(slotLocation, shopItem);
+        });
+
+        BetterShop.info("Finished loading shop '" + shop.getName() + "'!");
+
+        return shop;
+    }
+
+    public void saveToConfig() {
+        if (configuration == null) {
+            File file = new File(BetterShop.getInstance().getDataFolder() + "/Shops/" + name + ".yml");
+            configuration = YamlConfiguration.loadConfiguration(file);
+            configuration.options().header("~ BetterShop - Shop Configuration ~");
+
+            try {
+                configuration.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        contentsMap.forEach((slotLocation, shopItem) -> {
+            String slotLocationString = slotLocation.toString();
+
+            configuration.set("shop.contents." + slotLocationString + ".function", shopItem.getShopFunction());
+            configuration.set("shop.contents." + slotLocationString + ".buy_cost", shopItem.getBuyCost());
+            configuration.set("shop.contents." + slotLocationString + ".sell_cost", shopItem.getSellCost());
+            configuration.set("shop.contents." + slotLocationString + ".visibility", shopItem.getVisibility());
+            configuration.set("shop.contents." + slotLocationString + ".cooldown", shopItem.getCooldownSeconds());
+            configuration.set("shop.contents." + slotLocationString + ".itemstack",
+                    shopItem.getItemBuilder().getItemStack());
+
+            configuration.set("shop.contents." + slotLocationString + ".itemstack.contents", shopItem.getContents());
+
+            shopItem.getMessagesOptional().ifPresent(list -> {
+                configuration.set("shop.contents." + slotLocationString + ".messages", list);
+            });
+
+            shopItem.getPermissionOptional().ifPresent(permission -> {
+                configuration.set("shop.contents." + slotLocationString + ".permission", permission);
+            });
+        });
     }
 
     public static ContextResolver<Shop, BukkitCommandExecutionContext> getContextResolver() {
@@ -68,10 +155,10 @@ public class Shop {
     }
 
     public boolean isBeingEdited() {
-        return ShopManager.getEditingMap().containsValue(this);
+        return editingMap.containsValue(this);
     }
 
     public void removeEditor(Player player) {
-        ShopManager.getEditingMap().remove(player.getUniqueId());
+        editingMap.remove(player.getUniqueId());
     }
 }

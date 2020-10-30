@@ -62,7 +62,7 @@ public class ShopItem {
      *                           item
      * @param messagesOptional   what messages to send the user upon sale
      */
-    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, int buyCost, int sellCost, int cooldownSeconds,
+    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, double buyCost, double sellCost, int cooldownSeconds,
             Visibility visibility, Optional<String> permissionOptional, Optional<List<String>> messagesOptional,
             List<ItemStack> contents) {
         this.itemBuilder = new ItemBuilder(itemStack);

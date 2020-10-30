@@ -5,13 +5,11 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import pro.husk.bettershop.objects.Config;
 import pro.husk.bettershop.objects.Shop;
 
 @CommandAlias("bshop|bs")
@@ -28,17 +26,13 @@ public class BetterShopCommands extends BaseCommand {
     @Subcommand("create")
     @CommandPermission("shop.create")
     @Description("Creates a shop")
-    public void create(Player player, String shopName, @Optional String rows) {
+    public void create(Player player, String shopName) {
         if (Shop.getShopHashMap().containsKey(shopName)) {
             player.sendMessage(ChatColor.RED + "A shop with that name already exists!");
             return;
         }
 
-        if (rows == null) {
-            new Shop(shopName, Config.getDefaultShopRows());
-        } else {
-            new Shop(shopName, Integer.parseInt(rows));
-        }
+        new Shop(shopName);
 
         player.sendMessage(ChatColor.GREEN + "A shop with name '" + shopName + "' has been created!");
     }
