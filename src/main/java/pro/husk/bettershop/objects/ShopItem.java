@@ -23,11 +23,11 @@ public class ShopItem {
 
     @Getter
     @Setter
-    private int buyCost;
+    private double buyCost;
 
     @Getter
     @Setter
-    private int sellCost;
+    private double sellCost;
 
     @Getter
     @Setter

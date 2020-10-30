@@ -93,7 +93,7 @@ public class EditShopItemGUI implements CommonGUI {
             editMessagesItemBuilder.addLore(ChatColor.GREEN + shopItem.getPermissionOptional().get());
         }
 
-        ItemStack editPermissionsItem = editMessagesItemBuilder.getItemStack();
+        ItemStack editPermissionsItem = editPermissionsItemBuilder.getItemStack();
 
         ItemStack editVisibilityItem = new ItemBuilder(Material.GLASS).setName(ChatColor.GREEN + "Change visibility")
                 .addLore(ChatColor.WHITE + "Visibility: " + ChatColor.YELLOW + shopItem.getVisibility()).getItemStack();
@@ -116,7 +116,7 @@ public class EditShopItemGUI implements CommonGUI {
             player.closeInventory();
 
             PlayerChatInput.addWaitingOnInput(player, callback -> {
-                shopItem.setBuyCost(Integer.parseInt(callback));
+                shopItem.setBuyCost(Double.parseDouble(callback));
                 PlayerChatInput.removeWaitingOnInput(player);
                 this.show(player);
             }, "Please input the cost to buy this item");
@@ -127,7 +127,7 @@ public class EditShopItemGUI implements CommonGUI {
             player.closeInventory();
 
             PlayerChatInput.addWaitingOnInput(player, callback -> {
-                shopItem.setSellCost(Integer.parseInt(callback));
+                shopItem.setSellCost(Double.parseDouble(callback));
                 PlayerChatInput.removeWaitingOnInput(player);
                 this.show(player);
             }, "Please input the price rewarded on sale of this item");

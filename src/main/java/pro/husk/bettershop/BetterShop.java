@@ -2,7 +2,11 @@ package pro.husk.bettershop;
 
 import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import pro.husk.bettershop.commands.BetterShopCommands;
 import pro.husk.bettershop.events.PlayerChatInput;
@@ -17,6 +21,9 @@ public final class BetterShop extends JavaPlugin {
     @Getter
     private static BetterShop instance;
 
+    @Getter
+    private static Economy economy;
+
     private static Logger logger;
 
     private PaperCommandManager paperCommandManager;
@@ -26,15 +33,21 @@ public final class BetterShop extends JavaPlugin {
         instance = this;
         logger = getLogger();
 
+        // Load configs
         saveDefaultConfig();
         Config.loadConfig(getConfig());
         loadShops();
 
+        // Setup commands
         paperCommandManager = new PaperCommandManager(instance);
         paperCommandManager.getCommandContexts().registerContext(Shop.class, Shop.getContextResolver());
         paperCommandManager.registerCommand(new BetterShopCommands());
 
+        // Register events
         getServer().getPluginManager().registerEvents(new PlayerChatInput(), instance);
+
+        // Load vault
+        setupEconomy();
     }
 
     @Override
@@ -44,6 +57,18 @@ public final class BetterShop extends JavaPlugin {
 
     public static void info(String info) {
         logger.info(info);
+    }
+
+    private void setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+            if (rsp == null)
+                return;
+            economy = rsp.getProvider();
+        } else {
+            info("Vault not found - disabling!");
+            setEnabled(false);
+        }
     }
 
     private void loadShops() {

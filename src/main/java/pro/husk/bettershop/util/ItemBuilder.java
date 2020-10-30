@@ -44,6 +44,11 @@ public class ItemBuilder {
         return this;
     }
 
+    public String getName() {
+        ItemMeta itemMeta = getItemMetaSafely();
+        return itemMeta.getDisplayName();
+    }
+
     public ItemBuilder setAmount(int newAmount) {
         itemStack.setAmount(newAmount);
         return this;
@@ -67,6 +72,10 @@ public class ItemBuilder {
         itemStack.setItemMeta(itemMeta);
 
         return this;
+    }
+
+    public ItemBuilder clearLore() {
+        return setLore(new ArrayList<>());
     }
 
     public ItemBuilder removeLore() {
