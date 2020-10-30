@@ -9,16 +9,10 @@ import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.objects.Config;
 import pro.husk.bettershop.objects.Shop;
-import pro.husk.bettershop.objects.ShopFunction;
-import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.Visibility;
-import pro.husk.bettershop.util.MenuHelper;
 
 @CommandAlias("bshop|bs")
 @Description("BetterShop commands")
@@ -56,7 +50,8 @@ public class BetterShopCommands extends BaseCommand {
         shop.editShop(player);
     }
 
-    @CommandPermission("shop.edit")
+    @Subcommand("open")
+    @CommandPermission("shop.open")
     @Description("Opens a shop")
     public void open(Player player, Shop shop) {
         shop.open(player);
@@ -71,14 +66,5 @@ public class BetterShopCommands extends BaseCommand {
             sender.sendMessage(ChatColor.GREEN + shopName);
         }
         sender.sendMessage(ChatColor.GOLD + "====================");
-    }
-
-    @Subcommand("t")
-    @Description("test")
-    public void test(Player player) {
-        ShopItem dummyShopItem = new ShopItem(new ItemStack(Material.OBSIDIAN), ShopFunction.BUY, 10, 0, 0,
-                Visibility.ALL, java.util.Optional.empty(), java.util.Optional.empty());
-
-        MenuHelper.openEditMenu(player, dummyShopItem, "test");
     }
 }

@@ -4,7 +4,6 @@ import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.ipvp.canvas.MenuFunctionListener;
 import pro.husk.bettershop.commands.BetterShopCommands;
 import pro.husk.bettershop.events.PlayerChatInput;
 import pro.husk.bettershop.objects.Config;
@@ -35,7 +34,6 @@ public final class BetterShop extends JavaPlugin {
         paperCommandManager.getCommandContexts().registerContext(Shop.class, Shop.getContextResolver());
         paperCommandManager.registerCommand(new BetterShopCommands());
 
-        getServer().getPluginManager().registerEvents(new MenuFunctionListener(), instance);
         getServer().getPluginManager().registerEvents(new PlayerChatInput(), instance);
     }
 

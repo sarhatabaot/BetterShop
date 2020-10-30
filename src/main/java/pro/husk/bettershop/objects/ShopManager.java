@@ -10,5 +10,6 @@ public class ShopManager {
     @Getter
     private static final HashMap<UUID, Shop> editingMap = new HashMap<>();
 
-
+    @Getter
+    private static final HashMap<UUID, ShopItem> itemMoveCache = new HashMap<>();
 }

@@ -1,8 +1,9 @@
 package pro.husk.bettershop.util;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,7 +14,8 @@ import java.util.List;
 public class ItemBuilder {
 
     @Getter
-    private final ItemStack itemStack;
+    @Setter
+    private ItemStack itemStack;
 
     public ItemBuilder(Material material) {
         this.itemStack = new ItemStack(material);
@@ -23,8 +25,18 @@ public class ItemBuilder {
         this.itemStack = itemStack;
     }
 
-    public ItemBuilder setName(String name) {
+    private ItemMeta getItemMetaSafely() {
         ItemMeta itemMeta = itemStack.getItemMeta();
+
+        if (itemMeta == null) {
+            return Bukkit.getItemFactory().getItemMeta(itemStack.getType());
+        }
+
+        return itemMeta;
+    }
+
+    public ItemBuilder setName(String name) {
+        ItemMeta itemMeta = getItemMetaSafely();
 
         itemMeta.setDisplayName(StringUtil.colourise(name));
         itemStack.setItemMeta(itemMeta);
@@ -38,7 +50,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder addLore(String... lines) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+        ItemMeta itemMeta = getItemMetaSafely();
 
         List<String> lore = new ArrayList<>();
 
@@ -57,8 +69,19 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder removeLore() {
+        ItemMeta itemMeta = getItemMetaSafely();
+
+        if (itemMeta.hasLore()) {
+            List<String> lore = itemMeta.getLore();
+            lore.remove(lore.size() - 1);
+        }
+
+        return this;
+    }
+
     public ItemBuilder setLore(List<String> lore) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+        ItemMeta itemMeta = getItemMetaSafely();
 
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
@@ -91,6 +114,6 @@ public class ItemBuilder {
     }
 
     public boolean hasLore() {
-        return itemStack.getItemMeta().hasLore();
+        return getItemMetaSafely().hasLore();
     }
 }
