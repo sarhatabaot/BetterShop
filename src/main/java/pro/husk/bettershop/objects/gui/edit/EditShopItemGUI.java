@@ -68,7 +68,8 @@ public class EditShopItemGUI implements CommonGUI {
                 .name(ChatColor.GOLD + "Messages").addLore(ChatColor.YELLOW + "Manage the messages your item sends");
 
         ItemBuilder.Builder editCommandItemBuilder = ItemBuilder.builder(Material.WRITTEN_BOOK)
-                .name(ChatColor.GOLD + "Commands").addLore(ChatColor.YELLOW + "Add commands to run when users buy this item");
+                .name(ChatColor.GOLD + "Commands")
+                .addLore(ChatColor.YELLOW + "Add commands to run when users buy this item");
 
         // Add messages to the lore if present
         List<String> messages = shopItem.getMessages();
@@ -117,7 +118,7 @@ public class EditShopItemGUI implements CommonGUI {
             player.closeInventory();
 
             PlayerChatInput.addWaitingOnInput(player, callback -> {
-                shopItem.setBuyCost(Double.parseDouble(callback));
+                shopItem.setBuyCost(Integer.parseInt(callback));
                 PlayerChatInput.removeWaitingOnInput(player);
                 this.show(player);
             }, "Please input the cost to buy this item");
@@ -128,7 +129,7 @@ public class EditShopItemGUI implements CommonGUI {
             player.closeInventory();
 
             PlayerChatInput.addWaitingOnInput(player, callback -> {
-                shopItem.setSellCost(Double.parseDouble(callback));
+                shopItem.setSellCost(Integer.parseInt(callback));
                 PlayerChatInput.removeWaitingOnInput(player);
                 this.show(player);
             }, "Please input the price rewarded on sale of this item");
