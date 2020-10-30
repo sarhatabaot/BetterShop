@@ -5,16 +5,15 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.contexts.ContextResolver;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.BetterShop;
 import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.objects.gui.edit.EditShopDisplay;
 import pro.husk.bettershop.objects.gui.function.ViewShopDisplay;
 import pro.husk.bettershop.util.SlotLocation;
-
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.github.stefvanschie.inventoryframework.Gui;
 
 public class Shop {
 
@@ -58,7 +55,6 @@ public class Shop {
         CommonGUI gui = new EditShopDisplay(this);
 
         gui.getGui().setOnClose(close -> {
-            BetterShop.info("Saving shop: " + name);
             saveToConfig();
             removeEditor(player);
         });
@@ -79,6 +75,8 @@ public class Shop {
         Shop shop = new Shop(shopFile.getName().replaceAll(".yml", ""), configuration);
 
         ConfigurationSection section = configuration.getConfigurationSection("shop.contents");
+        if (section == null)
+            return null;
         section.getKeys(false).forEach(key -> {
             String functionString = section.getString(key + ".function");
             double buyCost = section.getDouble(key + ".buy_cost");
@@ -87,8 +85,24 @@ public class Shop {
             int cooldown = section.getInt(key + ".cooldown");
             ItemStack itemStack = section.getItemStack(key + ".itemstack.display");
             List<ItemStack> itemStackContents = (List<ItemStack>) section.getList(key + ".itemstack.contents");
-            Optional<List<String>> messagesOptional = Optional.ofNullable(section.getStringList(key + ".messages"));
-            Optional<String> permissionOptional = Optional.ofNullable(section.getString(key + ".permission"));
+
+            List<String> messages = section.getStringList(key + ".messages");
+            String permission = section.getString(key + ".permission");
+
+            Optional<List<String>> messagesOptional;
+            Optional<String> permissionOptional;
+
+            if (messages == null) {
+                messagesOptional = Optional.empty();
+            } else {
+                messagesOptional = Optional.of(messages);
+            }
+
+            if (permission == null) {
+                permissionOptional = Optional.empty();
+            } else {
+                permissionOptional = Optional.of(permission);
+            }
 
             ShopFunction function = ShopFunction.valueOf(functionString);
             Visibility visibility = Visibility.valueOf(visibilityString);
@@ -98,11 +112,7 @@ public class Shop {
                     permissionOptional, messagesOptional, itemStackContents);
 
             shop.getContentsMap().put(slotLocation, shopItem);
-
-            BetterShop.info("Finished loading item");
         });
-
-        BetterShop.info("Finished loading shop '" + shop.getName() + "'!");
 
         return shop;
     }
@@ -122,18 +132,14 @@ public class Shop {
             configuration.set("shop.contents." + slotLocationString + ".sell_cost", shopItem.getSellCost());
             configuration.set("shop.contents." + slotLocationString + ".visibility", shopItem.getVisibility().name());
             configuration.set("shop.contents." + slotLocationString + ".cooldown", shopItem.getCooldownSeconds());
-            configuration.set("shop.contents." + slotLocationString + ".itemstack.display",
-                    shopItem.getItemBuilder().getItemStack());
+            configuration.set("shop.contents." + slotLocationString + ".itemstack.display", shopItem.getItemStack());
 
             configuration.set("shop.contents." + slotLocationString + ".itemstack.contents", shopItem.getContents());
 
-            shopItem.getMessagesOptional().ifPresent(list -> {
-                configuration.set("shop.contents." + slotLocationString + ".messages", list);
-            });
-
-            shopItem.getPermissionOptional().ifPresent(permission -> {
-                configuration.set("shop.contents." + slotLocationString + ".permission", permission);
-            });
+            shopItem.getMessagesOptional()
+                    .ifPresent(list -> configuration.set("shop.contents." + slotLocationString + ".messages", list));
+            shopItem.getPermissionOptional().ifPresent(
+                    permission -> configuration.set("shop.contents." + slotLocationString + ".permission", permission));
         });
 
         try {

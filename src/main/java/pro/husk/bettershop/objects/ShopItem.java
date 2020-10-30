@@ -3,8 +3,8 @@ package pro.husk.bettershop.objects;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import pro.husk.bettershop.util.ItemBuilder;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class ShopItem {
 
     @Getter
     @Setter
-    private ItemBuilder itemBuilder;
+    private ItemStack itemStack;
 
     @Getter
     @Setter
@@ -49,7 +49,7 @@ public class ShopItem {
 
     /**
      * Constructor for a ShopItem
-     * 
+     *
      * @param itemStack          itemstack of the item
      * @param shopFunction       function of the item
      * @param buyCost            how much it cost to buy this item
@@ -62,10 +62,10 @@ public class ShopItem {
      *                           item
      * @param messagesOptional   what messages to send the user upon sale
      */
-    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, double buyCost, double sellCost, int cooldownSeconds,
-            Visibility visibility, Optional<String> permissionOptional, Optional<List<String>> messagesOptional,
-            List<ItemStack> contents) {
-        this.itemBuilder = new ItemBuilder(itemStack);
+    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, double buyCost, double sellCost,
+                    int cooldownSeconds, Visibility visibility, Optional<String> permissionOptional,
+                    Optional<List<String>> messagesOptional, List<ItemStack> contents) {
+        this.itemStack = itemStack;
         this.shopFunction = shopFunction;
         this.buyCost = buyCost;
         this.sellCost = sellCost;
@@ -78,7 +78,7 @@ public class ShopItem {
 
     /**
      * Used when creating a new ShopItem
-     * 
+     *
      * @param itemStack of the ShopItem
      */
     public ShopItem(ItemStack itemStack) {
@@ -88,7 +88,7 @@ public class ShopItem {
 
     /**
      * Adds a message to the optional list
-     * 
+     *
      * @param message to add
      */
     public void addMessage(String message) {
@@ -103,13 +103,13 @@ public class ShopItem {
 
     /**
      * Builds the display ItemStack ready for display on the Shop browse page
-     * 
+     *
      * @return ItemStack of this ShopItem instance
      */
     public ItemStack getDisplayItem() {
-        itemBuilder.addLore("");
-        itemBuilder.addLore(ChatColor.BLUE + "Function: " + shopFunction);
-        itemBuilder.addLore(ChatColor.YELLOW + "Visibility: " + visibility);
+        ItemBuilder.Builder itemBuilder = ItemBuilder.builder(itemStack.getType()).addLore("")
+                .addLore(ChatColor.BLUE + "Function: " + shopFunction)
+                .addLore(ChatColor.YELLOW + "Visibility: " + visibility);
 
         if (shopFunction == ShopFunction.BUY) {
             itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
@@ -120,6 +120,17 @@ public class ShopItem {
             itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
         }
 
-        return itemBuilder.getItemStack();
+        return itemBuilder.build();
+    }
+
+    public void setItemStackName(String newName) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(newName);
+        itemStack.setItemMeta(itemMeta);
+    }
+
+    public String getItemStackName() {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        return itemMeta.getDisplayName();
     }
 }

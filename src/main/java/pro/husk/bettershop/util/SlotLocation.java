@@ -25,7 +25,8 @@ public class SlotLocation {
 
     /**
      * Method to create a SlotLocation from the original slot index
-     * @param slot index
+     *
+     * @param slot   index
      * @param length of the inventory
      * @return SlotLocation object
      */
@@ -45,6 +46,7 @@ public class SlotLocation {
 
     /**
      * Method to create a SlotLocation from a String, used for loading Shop config
+     *
      * @param input string to load from
      * @return SlotLocation object
      */

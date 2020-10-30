@@ -3,13 +3,10 @@ package pro.husk.bettershop.objects.gui.edit;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-
-import lombok.Getter;
 import pro.husk.bettershop.objects.Shop;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.gui.CommonGUI;
@@ -19,9 +16,9 @@ import pro.husk.bettershop.util.SlotLocation;
 public class EditShopDisplay implements CommonGUI {
 
     @Getter
-    private Gui gui;
-    private Shop shop;
-    private StaticPane pane;
+    private final Gui gui;
+    private final Shop shop;
+    private final StaticPane pane;
     private ShopItem moveItem;
 
     public EditShopDisplay(Shop shop) {
@@ -31,9 +28,7 @@ public class EditShopDisplay implements CommonGUI {
 
         forceRefreshGUI();
 
-        gui.setOnOutsideClick(onOutsideClick -> {
-            onOutsideClick.setCancelled(true);
-        });
+        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
 
         gui.setOnTopClick(click -> {
             ItemStack clickedItem = click.getCurrentItem();
@@ -44,7 +39,7 @@ public class EditShopDisplay implements CommonGUI {
             if (moveItem != null) {
                 if (MenuHelper.isItemStackEmpty(clickedItem)) {
                     shop.addItem(moveItem, SlotLocation.fromSlotNumber(click.getSlot(), pane.getLength()));
-                    click.getWhoClicked().getInventory().remove(moveItem.getItemBuilder().getItemStack());
+                    click.getWhoClicked().getInventory().remove(moveItem.getItemStack());
                     moveItem = null;
                     gui.setTitle(ChatColor.GOLD + shop.getName());
                     renderShopItems(shop, pane);
@@ -81,7 +76,7 @@ public class EditShopDisplay implements CommonGUI {
 
     private void renderShopItems(Shop shop, StaticPane pane) {
         shop.getContentsMap().forEach((slotLocation, shopItem) -> {
-            ItemStack itemStack = shopItem.getItemBuilder().getItemStack();
+            ItemStack itemStack = shopItem.getItemStack().clone();
 
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 if (event.getClick() == ClickType.RIGHT) {

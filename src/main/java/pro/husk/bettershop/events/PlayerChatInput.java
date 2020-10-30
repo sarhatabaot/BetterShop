@@ -21,7 +21,7 @@ public class PlayerChatInput implements Listener {
 
     /**
      * Adds the target player to be monitored for text input
-     * 
+     *
      * @param player   to monitor
      * @param consumer of where to return the result
      * @param prompt   of what to send them prior to their input
@@ -33,7 +33,7 @@ public class PlayerChatInput implements Listener {
 
     /**
      * Removes the target player from being monitored for text input
-     * 
+     *
      * @param player to unmonitor
      */
     public static void removeWaitingOnInput(Player player) {
@@ -42,7 +42,7 @@ public class PlayerChatInput implements Listener {
 
     /**
      * This method returns whether or not a player is being polled for input
-     * 
+     *
      * @param player in question
      * @return whether or not monitoring the player is occuring
      */
@@ -53,7 +53,7 @@ public class PlayerChatInput implements Listener {
     /**
      * Listens for player chat events to check if that player is being monitored for
      * input handling
-     * 
+     *
      * @param event AsyncPlayerChatEvent
      */
     @EventHandler

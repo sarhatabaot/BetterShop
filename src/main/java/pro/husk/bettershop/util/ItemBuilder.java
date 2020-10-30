@@ -1,128 +1,121 @@
 package pro.husk.bettershop.util;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ItemBuilder {
 
-    @Getter
-    @Setter
-    private ItemStack itemStack;
-
-    public ItemBuilder(Material material) {
-        this.itemStack = new ItemStack(material);
+    public static Builder builder(Material type, int amount) {
+        return new Builder(type, amount);
     }
 
-    public ItemBuilder(ItemStack itemStack) {
-        this.itemStack = itemStack;
+    public static Builder builder(Material type) {
+        return new Builder(type, 1);
     }
 
-    private ItemMeta getItemMetaSafely() {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+    public static Builder builder(ItemStack itemStack) {
+        return new Builder(itemStack);
+    }
 
-        if (itemMeta == null) {
-            return Bukkit.getItemFactory().getItemMeta(itemStack.getType());
+    public static class Builder {
+
+        private Material type;
+        private int amount;
+        private String displayName;
+        private List<String> lore;
+
+        private Builder(Material type, int amount) {
+            this.type = type;
+            this.amount = amount;
         }
 
-        return itemMeta;
-    }
-
-    public ItemBuilder setName(String name) {
-        ItemMeta itemMeta = getItemMetaSafely();
-
-        itemMeta.setDisplayName(StringUtil.colourise(name));
-        itemStack.setItemMeta(itemMeta);
-
-        return this;
-    }
-
-    public String getName() {
-        ItemMeta itemMeta = getItemMetaSafely();
-        return itemMeta.getDisplayName();
-    }
-
-    public ItemBuilder setAmount(int newAmount) {
-        itemStack.setAmount(newAmount);
-        return this;
-    }
-
-    public ItemBuilder addLore(String... lines) {
-        ItemMeta itemMeta = getItemMetaSafely();
-
-        List<String> lore = new ArrayList<>();
-
-        if (itemMeta.hasLore()) {
-            lore = itemMeta.getLore();
+        private Builder(ItemStack itemStack) {
+            this.type = itemStack.getType();
+            this.amount = itemStack.getAmount();
+            this.lore = itemStack.getItemMeta().getLore();
+            this.displayName = itemStack.getItemMeta().getDisplayName();
         }
 
-        for (String line : lines) {
-            lore.add(StringUtil.colourise(line));
+        public Builder amount(int amount) {
+            this.amount = amount;
+            return this;
         }
 
-        itemMeta.setLore(lore);
-
-        itemStack.setItemMeta(itemMeta);
-
-        return this;
-    }
-
-    public ItemBuilder clearLore() {
-        return setLore(new ArrayList<>());
-    }
-
-    public ItemBuilder removeLore() {
-        ItemMeta itemMeta = getItemMetaSafely();
-
-        if (itemMeta.hasLore()) {
-            List<String> lore = itemMeta.getLore();
-            lore.remove(lore.size() - 1);
+        public Builder type(Material type) {
+            this.type = type;
+            return this;
         }
 
-        return this;
-    }
+        public Builder name(String name) {
+            this.displayName = name;
+            return this;
+        }
 
-    public ItemBuilder setLore(List<String> lore) {
-        ItemMeta itemMeta = getItemMetaSafely();
+        public void lore(List<String> lore) {
+            this.lore = lore;
+        }
 
-        itemMeta.setLore(lore);
-        itemStack.setItemMeta(itemMeta);
+        public Builder clearLore() {
+            this.lore = new ArrayList<>();
+            return this;
+        }
 
-        return this;
-    }
+        public Builder addLore(String... lore) {
+            if (this.lore == null)
+                this.lore = new ArrayList<>();
+            Collections.addAll(this.lore, lore);
+            return this;
+        }
 
-    public ItemBuilder setLoreIfSetOnArgument(ItemStack argument) {
-        ItemMeta itemMeta = argument.getItemMeta();
+        public Builder removeLore() {
+            int lastIndex = this.lore.size() - 1;
+            lore.remove(lastIndex);
+            return this;
+        }
 
-        if (itemMeta != null) {
-            if (itemMeta.hasLore()) {
-                this.setLore(itemMeta.getLore());
+        public ItemStack build() {
+            ItemStack itemStack = new ItemStack(type, amount);
+
+            ItemMeta itemMeta = itemStack.getItemMeta();
+
+            if (!(displayName == null || displayName.equals(""))) {
+                itemMeta.setDisplayName(displayName);
+            }
+
+            if (lore != null && !lore.isEmpty()) {
+                itemMeta.setLore(lore);
+            }
+
+            itemStack.setItemMeta(itemMeta);
+
+            return itemStack;
+        }
+
+        public void setLoreIfSetOnArgument(ItemStack argument) {
+            ItemMeta itemMeta = argument.getItemMeta();
+
+            if (itemMeta != null) {
+                if (itemMeta.hasLore()) {
+                    lore(itemMeta.getLore());
+                }
+            }
+
+        }
+
+        public void addNameToLoreIfSetOnArgument(ItemStack argument) {
+            ItemMeta itemMeta = argument.getItemMeta();
+
+            if (itemMeta != null) {
+                if (itemMeta.hasDisplayName()) {
+                    addLore(ChatColor.WHITE + itemMeta.getDisplayName());
+                }
             }
         }
-
-        return this;
-    }
-
-    public ItemBuilder addNameToLoreIfSetOnArgument(ItemStack argument) {
-        ItemMeta itemMeta = argument.getItemMeta();
-
-        if (itemMeta != null) {
-            if (itemMeta.hasDisplayName()) {
-                this.addLore(ChatColor.WHITE + itemMeta.getDisplayName());
-            }
-        }
-
-        return this;
-    }
-
-    public boolean hasLore() {
-        return getItemMetaSafely().hasLore();
     }
 }

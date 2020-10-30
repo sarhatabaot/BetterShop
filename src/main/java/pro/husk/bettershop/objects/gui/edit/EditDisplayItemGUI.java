@@ -3,7 +3,6 @@ package pro.husk.bettershop.objects.gui.edit;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -20,10 +19,10 @@ import pro.husk.bettershop.util.SlotLocation;
 public class EditDisplayItemGUI implements CommonGUI {
 
     @Getter
-    private Gui gui;
-    private ShopItem shopItem;
-    private StaticPane pane;
-    private CommonGUI backGui;
+    private final Gui gui;
+    private final ShopItem shopItem;
+    private final StaticPane pane;
+    private final CommonGUI backGui;
 
     public EditDisplayItemGUI(ShopItem shopItem, CommonGUI backGui) {
         this.shopItem = shopItem;
@@ -34,39 +33,36 @@ public class EditDisplayItemGUI implements CommonGUI {
         forceRefreshGUI();
 
         // Disable outside clicks
-        gui.setOnOutsideClick(onOutsideClick -> {
-            onOutsideClick.setCancelled(true);
-        });
+        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
 
         // Disable bottom clicks
-        gui.setOnBottomClick(onBottomClick -> {
-            onBottomClick.setCancelled(true);
-        });
+        gui.setOnBottomClick(onBottomClick -> onBottomClick.setCancelled(true));
 
         gui.addPane(pane);
     }
 
     private void renderItems(StaticPane pane, CommonGUI backGui) {
-        ItemBuilder nameItemBuilder = new ItemBuilder(Material.NAME_TAG)
-                .setName(ChatColor.GREEN + "Change display name");
+        ItemBuilder.Builder nameItemBuilder = ItemBuilder.builder(Material.NAME_TAG)
+                .name(ChatColor.GREEN + "Change display name");
 
-        ItemBuilder loreItemBuilder = new ItemBuilder(Material.BOOK).setName(ChatColor.GREEN + "Add lore");
+        ItemBuilder.Builder loreItemBuilder = ItemBuilder.builder(Material.BOOK).name(ChatColor.GREEN + "Add lore");
 
-        ItemBuilder amountItemBuilder = new ItemBuilder(Material.ANVIL).setName(ChatColor.GREEN + "Change amount")
-                .addLore("" + ChatColor.WHITE + shopItem.getItemBuilder().getItemStack().getAmount());
+        ItemBuilder.Builder amountItemBuilder = ItemBuilder.builder(Material.ANVIL)
+                .name(ChatColor.GREEN + "Change amount")
+                .addLore("" + ChatColor.WHITE + shopItem.getItemStack().getAmount());
 
-        ItemStack shopItemStack = shopItem.getItemBuilder().getItemStack();
+        ItemStack shopItemStack = shopItem.getItemStack().clone();
 
         nameItemBuilder.addNameToLoreIfSetOnArgument(shopItemStack);
         loreItemBuilder.setLoreIfSetOnArgument(shopItemStack);
 
         // Handle name item
-        GuiItem nameItem = new GuiItem(nameItemBuilder.getItemStack(), event -> {
+        GuiItem nameItem = new GuiItem(nameItemBuilder.build(), event -> {
             Player player = (Player) event.getWhoClicked();
             if (event.getClick() == ClickType.LEFT) {
                 player.closeInventory();
                 PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.getItemBuilder().setName(callback);
+                    shopItem.setItemStackName(callback);
                     PlayerChatInput.removeWaitingOnInput(player);
                     renderItems(pane, backGui);
                     gui.show(player);
@@ -74,29 +70,29 @@ public class EditDisplayItemGUI implements CommonGUI {
             }
         });
 
-        GuiItem loreItem = new GuiItem(loreItemBuilder.getItemStack(), event -> {
+        GuiItem loreItem = new GuiItem(loreItemBuilder.build(), event -> {
             Player player = (Player) event.getWhoClicked();
 
             if (event.getClick() == ClickType.LEFT) {
                 player.closeInventory();
                 PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.getItemBuilder().addLore(callback);
+                    shopItem.setItemStack(ItemBuilder.builder(shopItemStack).addLore(callback).build());
                     PlayerChatInput.removeWaitingOnInput(player);
                     renderItems(pane, backGui);
                     gui.show(player);
                 }, "Please enter a single line of lore you want");
             } else if (event.getClick() == ClickType.RIGHT) {
-                shopItem.getItemBuilder().removeLore();
+                shopItem.setItemStack(ItemBuilder.builder(shopItemStack).removeLore().build());
             }
         });
 
-        GuiItem amountItem = new GuiItem(amountItemBuilder.getItemStack(), event -> {
+        GuiItem amountItem = new GuiItem(amountItemBuilder.build(), event -> {
             Player player = (Player) event.getWhoClicked();
 
             if (event.getClick() == ClickType.LEFT) {
                 player.closeInventory();
                 PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.getItemBuilder().setAmount(Integer.parseInt(callback));
+                    shopItem.setItemStack(ItemBuilder.builder(shopItemStack).amount(Integer.parseInt(callback)).build());
                     PlayerChatInput.removeWaitingOnInput(player);
                     renderItems(pane, backGui);
                     gui.show(player);

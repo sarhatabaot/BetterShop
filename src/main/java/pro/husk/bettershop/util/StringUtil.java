@@ -32,5 +32,4 @@ public final class StringUtil {
         // Apply legacy transformations at end
         return ChatColor.translateAlternateColorCodes('&', input);
     }
-
 }

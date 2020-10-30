@@ -3,26 +3,24 @@ package pro.husk.bettershop.objects.gui.edit;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-
+import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
 
 public class EditShopItemFunction implements CommonGUI {
 
     @Getter
-    private Gui gui;
-    private ShopItem shopItem;
-    private CommonGUI backGui;
-    private StaticPane pane;
+    private final Gui gui;
+    private final ShopItem shopItem;
+    private final CommonGUI backGui;
+    private final StaticPane pane;
 
     public EditShopItemFunction(ShopItem shopItem, CommonGUI backGui) {
         this.gui = new Gui(1, ChatColor.GOLD + "Editing function:");
@@ -33,14 +31,10 @@ public class EditShopItemFunction implements CommonGUI {
         forceRefreshGUI();
 
         // Disable outside clicks
-        gui.setOnOutsideClick(onOutsideClick -> {
-            onOutsideClick.setCancelled(true);
-        });
+        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
 
         // Disable bottom clicks
-        gui.setOnBottomClick(onBottomClick -> {
-            onBottomClick.setCancelled(true);
-        });
+        gui.setOnBottomClick(onBottomClick -> onBottomClick.setCancelled(true));
 
         gui.addPane(pane);
     }
@@ -52,8 +46,8 @@ public class EditShopItemFunction implements CommonGUI {
         for (int i = 0; i < shopFunctionAmount; i++) {
             ShopFunction function = ShopFunction.values()[i];
 
-            ItemStack itemStack = new ItemBuilder(Material.BOOKSHELF).setName(ChatColor.GOLD + function.name())
-                    .getItemStack();
+            ItemStack itemStack = ItemBuilder.builder(Material.BOOKSHELF).name(ChatColor.GOLD + function.name())
+                    .build();
 
             GuiItem guiItem = new GuiItem(itemStack, click -> {
                 int clickedSlotIndex = click.getSlot();

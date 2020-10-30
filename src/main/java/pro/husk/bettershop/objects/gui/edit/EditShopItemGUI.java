@@ -1,17 +1,13 @@
 package pro.husk.bettershop.objects.gui.edit;
 
-import java.util.Optional;
-
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import lombok.Getter;
 import pro.husk.bettershop.events.PlayerChatInput;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
@@ -20,13 +16,15 @@ import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 
+import java.util.Optional;
+
 public class EditShopItemGUI implements CommonGUI {
 
     @Getter
-    private Gui gui;
-    private ShopItem shopItem;
-    private CommonGUI backGui;
-    private StaticPane pane;
+    private final Gui gui;
+    private final ShopItem shopItem;
+    private final CommonGUI backGui;
+    private final StaticPane pane;
 
     public EditShopItemGUI(ShopItem shopItem, CommonGUI backGui) {
         this.shopItem = shopItem;
@@ -37,54 +35,48 @@ public class EditShopItemGUI implements CommonGUI {
         forceRefreshGUI();
 
         // Disable outside clicks
-        gui.setOnOutsideClick(onOutsideClick -> {
-            onOutsideClick.setCancelled(true);
-        });
+        gui.setOnOutsideClick(onOutsideClick -> onOutsideClick.setCancelled(true));
 
         // Disable bottom clicks
-        gui.setOnBottomClick(onBottomClick -> {
-            onBottomClick.setCancelled(true);
-        });
+        gui.setOnBottomClick(onBottomClick -> onBottomClick.setCancelled(true));
 
         gui.addPane(pane);
     }
 
     private void renderItems(StaticPane pane, CommonGUI backGui) {
-        ItemStack displayItem = shopItem.getItemBuilder().getItemStack();
+        ItemStack displayItem = shopItem.getItemStack();
 
         // Build all ItemStacks of our items
-        ItemStack editDisplayItem = new ItemBuilder(Material.BOOK).setName(ChatColor.GOLD + "Item display")
-                .addLore(ChatColor.YELLOW + "Modify your item's display").getItemStack();
+        ItemStack editDisplayItem = ItemBuilder.builder(Material.BOOK).name(ChatColor.GOLD + "Item display")
+                .addLore(ChatColor.YELLOW + "Modify your item's display").build();
 
-        ItemStack editFunctionItem = new ItemBuilder(Material.EMERALD).setName(ChatColor.GREEN + "Function")
+        ItemStack editFunctionItem = ItemBuilder.builder(Material.EMERALD).name(ChatColor.GREEN + "Function")
                 .addLore(ChatColor.GOLD + "Change the function of your item")
                 .addLore(ChatColor.BLUE + "Current function: " + ChatColor.AQUA + shopItem.getShopFunction().name())
-                .getItemStack();
+                .build();
 
-        ItemStack editBuyCostItem = new ItemBuilder(Material.GOLD_INGOT).setName(ChatColor.GOLD + "Change cost")
-                .addLore(ChatColor.WHITE + "Cost: " + ChatColor.GREEN + shopItem.getBuyCost()).getItemStack();
+        ItemStack editBuyCostItem = ItemBuilder.builder(Material.GOLD_INGOT).name(ChatColor.GOLD + "Change cost")
+                .addLore(ChatColor.WHITE + "Cost: " + ChatColor.GREEN + shopItem.getBuyCost()).build();
 
-        ItemStack editSellCostItem = new ItemBuilder(Material.DIAMOND).setName(ChatColor.GOLD + "Change sell cost")
-                .addLore(ChatColor.WHITE + "Sell: " + ChatColor.GREEN + shopItem.getSellCost()).getItemStack();
+        ItemStack editSellCostItem = ItemBuilder.builder(Material.DIAMOND).name(ChatColor.GOLD + "Change sell cost")
+                .addLore(ChatColor.WHITE + "Sell: " + ChatColor.GREEN + shopItem.getSellCost()).build();
 
-        ItemStack editContentsItem = new ItemBuilder(Material.CHEST).setName(ChatColor.GREEN + "Item inventory")
-                .addLore(ChatColor.GOLD + "Edit item's inventory").getItemStack();
+        ItemStack editContentsItem = ItemBuilder.builder(Material.CHEST).name(ChatColor.GREEN + "Item inventory")
+                .addLore(ChatColor.GOLD + "Edit item's inventory").build();
 
-        ItemBuilder editMessagesItemBuilder = new ItemBuilder(Material.PAPER).setName(ChatColor.GOLD + "Messages")
+        ItemBuilder.Builder editMessagesItemBuilder = ItemBuilder.builder(Material.PAPER).name(ChatColor.GOLD + "Messages")
                 .addLore(ChatColor.YELLOW + "Manage the messages your item sends");
 
         // Add the messages in the item's lore if present
         if (shopItem.getMessagesOptional().isPresent()) {
             editMessagesItemBuilder.addLore("");
 
-            shopItem.getMessagesOptional().get().forEach(message -> {
-                editMessagesItemBuilder.addLore(message);
-            });
+            shopItem.getMessagesOptional().get().forEach(editMessagesItemBuilder::addLore);
         }
 
-        ItemStack editMessagesItem = editMessagesItemBuilder.getItemStack();
+        ItemStack editMessagesItem = editMessagesItemBuilder.build();
 
-        ItemBuilder editPermissionsItemBuilder = new ItemBuilder(Material.BARRIER).setName(ChatColor.GOLD + "Permissions")
+        ItemBuilder.Builder editPermissionsItemBuilder = ItemBuilder.builder(Material.BARRIER).name(ChatColor.GOLD + "Permissions")
                 .addLore(ChatColor.YELLOW + "Users with this permission will see the item in the shop");
 
         // Add the messages in the item's lore if present
@@ -93,10 +85,10 @@ public class EditShopItemGUI implements CommonGUI {
             editMessagesItemBuilder.addLore(ChatColor.GREEN + shopItem.getPermissionOptional().get());
         }
 
-        ItemStack editPermissionsItem = editPermissionsItemBuilder.getItemStack();
+        ItemStack editPermissionsItem = editPermissionsItemBuilder.build();
 
-        ItemStack editVisibilityItem = new ItemBuilder(Material.GLASS).setName(ChatColor.GREEN + "Change visibility")
-                .addLore(ChatColor.WHITE + "Visibility: " + ChatColor.YELLOW + shopItem.getVisibility()).getItemStack();
+        ItemStack editVisibilityItem = ItemBuilder.builder(Material.GLASS).name(ChatColor.GREEN + "Change visibility")
+                .addLore(ChatColor.WHITE + "Visibility: " + ChatColor.YELLOW + shopItem.getVisibility()).build();
 
         // Build GuiItem of each of the ItemStacks
         GuiItem displayGuiItem = new GuiItem(displayItem, event -> event.setCancelled(true));
@@ -199,7 +191,7 @@ public class EditShopItemGUI implements CommonGUI {
             pane.addItem(editBuyCostGuiItem, editBuyCostSlot.getX(), editBuyCostSlot.getY());
         }
 
-        ItemStack filler = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("").getItemStack();
+        ItemStack filler = ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name("").build();
         pane.fillWith(filler);
     }
 

@@ -3,14 +3,13 @@ package pro.husk.bettershop.util;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import pro.husk.bettershop.BetterShop;
 
 public final class TransactionUtil {
 
     /**
      * Returns how many of itemStack the player has
-     * 
+     *
      * @param player    to check
      * @param itemStack to check for
      * @return number of itemStack the player has
@@ -28,7 +27,7 @@ public final class TransactionUtil {
 
     /**
      * Utility method to check if two ItemStacks are equal
-     * 
+     *
      * @param first  itemstack
      * @param second itemstack
      * @return whether they are the same

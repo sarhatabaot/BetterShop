@@ -3,8 +3,6 @@ package pro.husk.bettershop;
 import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
-
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import pro.husk.bettershop.commands.BetterShopCommands;

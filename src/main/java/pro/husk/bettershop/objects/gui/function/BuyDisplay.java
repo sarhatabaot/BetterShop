@@ -1,19 +1,16 @@
 package pro.husk.bettershop.objects.gui.function;
 
-import java.util.HashMap;
-
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import lombok.Getter;
+import org.bukkit.inventory.meta.ItemMeta;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
@@ -21,108 +18,110 @@ import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 import pro.husk.bettershop.util.TransactionUtil;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class BuyDisplay implements CommonGUI {
 
     @Getter
-    private Gui gui;
-    private ShopItem shopItem;
-    private StaticPane pane;
-    private Player viewer;
+    private final Gui gui;
+    private final ShopItem shopItem;
+    private final StaticPane pane;
+    private final CommonGUI backGui;
     private int amount;
 
-    public BuyDisplay(ShopItem shopItem, Player viewer) {
+    public BuyDisplay(ShopItem shopItem, CommonGUI backGui) {
         this.shopItem = shopItem;
         this.gui = new Gui(6, ChatColor.GOLD + "Buy item:");
+        this.backGui = backGui;
         this.pane = new StaticPane(0, 0, 9, 6);
-        this.viewer = viewer;
         this.amount = 0;
 
         forceRefreshGUI();
 
-        gui.setOnOutsideClick(onOutsideClick -> {
-            onOutsideClick.setCancelled(true);
-        });
-
-        gui.setOnBottomClick(click -> {
-            click.setCancelled(true);
-        });
+        gui.setOnGlobalClick(click -> click.setCancelled(true));
 
         gui.addPane(pane);
     }
 
-    private void renderMenu(ShopItem shopItem, StaticPane pane, Player viewer) {
+    private void renderMenu(ShopItem shopItem, StaticPane pane, CommonGUI backGui) {
+
         double cost = amount * shopItem.getBuyCost();
 
-        ItemBuilder plusItem = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE);
+        ItemBuilder.Builder plusItem = ItemBuilder.builder(Material.GREEN_STAINED_GLASS_PANE);
 
-        ItemStack plus1 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+1").clearLore()
+        ItemStack plus1 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+1").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-1")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
 
-        ItemStack plus8 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+8").clearLore()
+        ItemStack plus8 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+8").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-8")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
 
-        ItemStack plus16 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+16").clearLore()
+        ItemStack plus16 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+16").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-16")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
 
-        ItemStack plus32 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+32").clearLore()
+        ItemStack plus32 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+32").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-32")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
 
-        ItemStack plus64 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+64").clearLore()
+        ItemStack plus64 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+64").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-64")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
 
-        ItemStack plus128 = plusItem.setName(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+128").clearLore()
+        ItemStack plus128 = plusItem.name(ChatColor.YELLOW + "Left click: " + ChatColor.GREEN + "+128").clearLore()
                 .addLore(ChatColor.YELLOW + "Right click: " + ChatColor.RED + "-128")
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).getItemStack().clone();
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost).build();
 
-        ItemStack displayItem = shopItem.getItemBuilder()
-                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "Price: " + cost)
-                .addLore("", ChatColor.DARK_GREEN + "Click to buy").getItemStack().clone();
+        ItemStack displayItem = shopItem.getItemStack().clone();
+        ItemMeta itemMeta = displayItem.getItemMeta();
+        List<String> lore = itemMeta.getLore();
 
-        GuiItem backButton = MenuHelper.getBackButton(this);
+        if (lore == null) {
+            lore = new ArrayList<>();
+        }
 
-        GuiItem displayGuiItem = new GuiItem(displayItem, event -> {
-            handlePurchase(event, shopItem, amount, cost);
-            event.setCancelled(true);
-        });
+        lore.add("");
+        lore.add(ChatColor.BLUE + "Amount: " + amount);
+        lore.add(ChatColor.GREEN + "Price: " + cost);
+
+        itemMeta.setLore(lore);
+        displayItem.setItemMeta(itemMeta);
+
+        GuiItem backButton = MenuHelper.getBackButton(backGui);
+
+        GuiItem displayGuiItem = new GuiItem(displayItem, event -> handlePurchase(event, shopItem, amount, cost));
 
         GuiItem plus1GuiItem = new GuiItem(plus1, event -> {
-            amount += 1;
-            forceRefreshGUI();
-            event.setCancelled(true);
+            handleClick(event, 1);
+            show(event.getWhoClicked());
         });
 
         GuiItem plus8GuiItem = new GuiItem(plus8, event -> {
-            amount += 8;
-            forceRefreshGUI();
-            event.setCancelled(true);
+            handleClick(event, 8);
+            show(event.getWhoClicked());
         });
 
         GuiItem plus16GuiItem = new GuiItem(plus16, event -> {
-            amount += 16;
-            forceRefreshGUI();
-            event.setCancelled(true);
+            handleClick(event, 16);
+            show(event.getWhoClicked());
         });
 
         GuiItem plus32GuiItem = new GuiItem(plus32, event -> {
-            amount += 32;
-            forceRefreshGUI();
+            handleClick(event, 32);
+            show(event.getWhoClicked());
         });
 
         GuiItem plus64GuiItem = new GuiItem(plus64, event -> {
-            amount += 64;
-            forceRefreshGUI();
-            event.setCancelled(true);
+            handleClick(event, 64);
+            show(event.getWhoClicked());
         });
 
         GuiItem plus128GuiItem = new GuiItem(plus128, event -> {
-            amount += 128;
-            forceRefreshGUI();
-            event.setCancelled(true);
+            handleClick(event, 128);
+            show(event.getWhoClicked());
         });
 
         // Get the respective locations
@@ -146,11 +145,26 @@ public class BuyDisplay implements CommonGUI {
         pane.addItem(backButton, backLocation.getX(), backLocation.getY());
 
         // Fill remainder
-        pane.fillWith(new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("").getItemStack());
+        pane.fillWith(ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name("").build());
+    }
+
+    private void handleClick(InventoryClickEvent event, int adjustment) {
+        ClickType clickType = event.getClick();
+        if (clickType == ClickType.LEFT) {
+            amount += adjustment;
+        } else if (clickType == ClickType.RIGHT) {
+            if (amount - adjustment > 0) {
+                amount -= adjustment;
+            } else {
+                event.setCancelled(true);
+            }
+        }
     }
 
     private void handlePurchase(InventoryClickEvent event, ShopItem shopItem, int amount, double cost) {
-        ItemStack itemStack = shopItem.getItemBuilder().setAmount(amount).getItemStack();
+        ItemStack itemStack = shopItem.getItemStack().clone();
+        itemStack.setAmount(amount);
+
         Player player = (Player) event.getWhoClicked();
 
         double balance = TransactionUtil.getBalance(player);
@@ -161,24 +175,25 @@ public class BuyDisplay implements CommonGUI {
             HashMap<Integer, ItemStack> failedItems = player.getInventory().addItem(itemStack);
             if (!failedItems.isEmpty()) {
                 player.getLocation().getWorld().dropItemNaturally(player.getLocation(), itemStack);
-            } else {
-                if (shopItem.getMessagesOptional().isPresent()) {
-                    shopItem.getMessagesOptional().get().forEach(message -> {
-                        player.sendMessage(message);
-                    });
-                } else {
-                    player.sendMessage(ChatColor.GREEN + "You have purchased " + ChatColor.AQUA + amount
-                            + ChatColor.WHITE + shopItem.getItemBuilder().getName() + ChatColor.GREEN + " for "
-                            + ChatColor.DARK_GREEN + "$" + cost);
-
-                    player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + balance);
-                }
             }
+
+            List<String> messages = shopItem.getMessagesOptional().get();
+            if (messages.size() != 0) {
+                messages.forEach(player::sendMessage);
+            } else {
+                player.sendMessage(ChatColor.GREEN + "You have purchased " + ChatColor.AQUA + amount + ChatColor.WHITE
+                        + " " + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
+                        + cost);
+
+                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + balance);
+            }
+
+            player.closeInventory();
         }
     }
 
     @Override
     public void forceRefreshGUI() {
-        renderMenu(shopItem, pane, viewer);
+        renderMenu(shopItem, pane, backGui);
     }
 }
