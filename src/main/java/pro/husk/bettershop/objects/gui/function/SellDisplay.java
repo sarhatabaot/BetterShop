@@ -169,6 +169,7 @@ public class SellDisplay implements CommonGUI {
         Player player = (Player) event.getWhoClicked();
 
         ItemStack itemStack = shopItem.getItemStack();
+        itemStack.setAmount(amount);
 
         if (TransactionUtil.getContainsAmount(player, itemStack) >= amount) {
             TransactionUtil.removeCustomItem(player, itemStack);

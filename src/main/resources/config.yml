@@ -5,5 +5,4 @@
 # |                       https://github.com/Huskehhh/BetterShop                                 | #
 # |                                                                                              | #
 # +----------------------------------------------------------------------------------------------+ #
-
-default-shop-rows: 5
+default-shop: "MAIN"

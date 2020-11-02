@@ -5,21 +5,31 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import pro.husk.bettershop.objects.Config;
 import pro.husk.bettershop.objects.Shop;
 
-@CommandAlias("bshop|bs")
+@CommandAlias("shop|bettershop|bs")
 @Description("BetterShop commands")
 public class BetterShopCommands extends BaseCommand {
 
-    @Default
     @Description("Shows the default help menu")
     @Subcommand("help")
     public void help(CommandSender sender) {
         sender.sendMessage("");
+    }
+
+    @Default
+    @Description("Shows the default shop")
+    public void shop(Player player, @Optional Shop shop) {
+        if (shop == null) {
+            shop = Shop.getFromName(Config.getDefaultShop());
+        }
+        shop.open(player);
     }
 
     @Subcommand("create")
@@ -41,13 +51,6 @@ public class BetterShopCommands extends BaseCommand {
     @Description("Edits a shop")
     public void edit(Player player, Shop shop) {
         shop.editShop(player);
-    }
-
-    @Subcommand("open")
-    @CommandPermission("shop.open")
-    @Description("Opens a shop")
-    public void open(Player player, Shop shop) {
-        shop.open(player);
     }
 
     @Subcommand("list")

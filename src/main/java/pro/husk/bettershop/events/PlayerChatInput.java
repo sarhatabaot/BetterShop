@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import pro.husk.bettershop.BetterShop;
+import pro.husk.bettershop.util.StringUtil;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class PlayerChatInput implements Listener {
     /**
      * Removes the target player from being monitored for text input
      *
-     * @param player to unmonitor
+     * @param player to un-monitor
      */
     public static void removeWaitingOnInput(Player player) {
         waitingOnInput.remove(player.getUniqueId());
@@ -44,7 +45,7 @@ public class PlayerChatInput implements Listener {
      * This method returns whether or not a player is being polled for input
      *
      * @param player in question
-     * @return whether or not monitoring the player is occuring
+     * @return whether or not monitoring the player is occurring
      */
     public static boolean isWaitingOnInput(Player player) {
         return waitingOnInput.containsKey(player.getUniqueId());
@@ -66,7 +67,7 @@ public class PlayerChatInput implements Listener {
             if (!message.equalsIgnoreCase("-cancel")) {
                 // Run sync cause InventoryOpen cant be done async
                 Bukkit.getScheduler().runTask(BetterShop.getInstance(),
-                        () -> waitingOnInput.get(player.getUniqueId()).accept(message));
+                        () -> waitingOnInput.get(player.getUniqueId()).accept(StringUtil.colourise(message)));
                 player.sendMessage(ChatColor.GREEN + "Thanks for that! You should be able to chat as per normal now!");
             } else {
                 waitingOnInput.remove(player.getUniqueId());

@@ -1,15 +1,13 @@
 package pro.husk.bettershop.objects.gui.function;
 
-import java.util.List;
-
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.objects.Shop;
@@ -18,6 +16,8 @@ import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.Visibility;
 import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.util.TransactionUtil;
+
+import java.util.List;
 
 public class ViewShopDisplay implements CommonGUI {
 
@@ -63,7 +63,11 @@ public class ViewShopDisplay implements CommonGUI {
         ShopFunction function = shopItem.getShopFunction();
 
         if (function == ShopFunction.BUY) {
-            new BuyDisplay(shopItem, this).show(player);
+            if (event.getClick() == ClickType.LEFT) {
+                new BuyDisplay(shopItem, this).show(player);
+            } else if (event.getClick() == ClickType.RIGHT) {
+                new SellDisplay(shopItem, this).show(player);
+            }
         } else if (function == ShopFunction.SELL) {
             new SellDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.TRADE) {

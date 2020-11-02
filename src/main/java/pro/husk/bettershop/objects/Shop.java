@@ -142,6 +142,10 @@ public class Shop {
         };
     }
 
+    public static Shop getFromName(String name) {
+        return shopHashMap.get(name);
+    }
+
     public void addItem(ShopItem shopItem, SlotLocation slotLocation) {
         contentsMap.put(slotLocation, shopItem);
     }
