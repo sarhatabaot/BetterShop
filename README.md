@@ -18,9 +18,10 @@ This is aimed to improve in all these aspects.
 ## 💻 Commands
 | Command | Description | Permission |
 | --------------- | ---------------- | ---------------- |
-| \/shop | Shows the main shop | N/A
-| \/shop create <shopname> | Creates a shop with given name | shop.create
-| \/shop edit <shopname> | Edits the shop with given name | shop.edit
+| \/shop shopName | Shows the main shop or if provided, the given shop name | N/A
+| \/shop create shopName | Creates a shop with given name | shop.create
+| \/shop delete shopName | Deletes a shop with given name | shop.delete
+| \/shop edit shopName | Edits the shop with given name | shop.edit
 | \/shop | Lists all shops | shop.list
 
 ## ❌ Issues / Feature request

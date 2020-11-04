@@ -2,6 +2,7 @@ package pro.husk.bettershop.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
@@ -25,6 +26,7 @@ public class BetterShopCommands extends BaseCommand {
 
     @Default
     @Description("Shows the default shop")
+    @CommandCompletion("* @shops")
     public void shop(Player player, @Optional Shop shop) {
         if (shop == null) {
             shop = Shop.getFromName(Config.getDefaultShop());
@@ -48,9 +50,22 @@ public class BetterShopCommands extends BaseCommand {
 
     @Subcommand("edit")
     @CommandPermission("shop.edit")
+    @CommandCompletion("* @shops")
     @Description("Edits a shop")
     public void edit(Player player, Shop shop) {
         shop.editShop(player);
+    }
+
+    @Subcommand("delete")
+    @CommandPermission("shop.delete")
+    @CommandCompletion("* @shops")
+    @Description("Deletes a shop")
+    public void delete(Player player, Shop shop) {
+        if (shop.delete()) {
+            player.sendMessage(ChatColor.GREEN + "Successfully deleted shop!");
+        } else {
+            player.sendMessage(ChatColor.RED + "Failed to delete shop!");
+        }
     }
 
     @Subcommand("list")

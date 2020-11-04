@@ -130,6 +130,18 @@ public class Shop {
         }
     }
 
+    public boolean delete() {
+        shopHashMap.remove(name);
+
+        File file = new File(BetterShop.getInstance().getDataFolder() + "/Shops/" + name + ".yml");
+
+        if (file.exists()) {
+            return file.delete();
+        }
+
+        return false;
+    }
+
     public static ContextResolver<Shop, BukkitCommandExecutionContext> getContextResolver() {
         return (c) -> {
             Shop shop = shopHashMap.get(c.popFirstArg());

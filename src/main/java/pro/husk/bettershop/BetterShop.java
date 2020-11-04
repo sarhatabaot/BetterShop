@@ -37,6 +37,7 @@ public final class BetterShop extends JavaPlugin {
 
         // Setup commands
         paperCommandManager = new PaperCommandManager(instance);
+        paperCommandManager.getCommandCompletions().registerAsyncCompletion("shops", c -> Shop.getShopHashMap().keySet());
         paperCommandManager.getCommandContexts().registerContext(Shop.class, Shop.getContextResolver());
         paperCommandManager.registerCommand(new BetterShopCommands());
 
