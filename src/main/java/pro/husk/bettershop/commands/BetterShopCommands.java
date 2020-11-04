@@ -11,6 +11,7 @@ import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import pro.husk.bettershop.BetterShop;
 import pro.husk.bettershop.objects.Config;
 import pro.husk.bettershop.objects.Shop;
 
@@ -77,5 +78,13 @@ public class BetterShopCommands extends BaseCommand {
             sender.sendMessage(ChatColor.GREEN + shopName);
         }
         sender.sendMessage(ChatColor.GOLD + "====================");
+    }
+
+    @Subcommand("reload")
+    @CommandPermission("shop.reload")
+    @Description("Reloads all configuration")
+    public void reload(CommandSender sender) {
+        Config.loadConfig(BetterShop.getInstance().getConfig());
+        sender.sendMessage(ChatColor.GREEN + "Config has been reloaded.");
     }
 }
