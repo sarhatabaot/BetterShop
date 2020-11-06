@@ -1,2 +1,6 @@
 [build]
 commands = ["mvn clean package"]
+
+[archive]
+files = ["target/BetterShop-"]
+append_buildnumber = true
