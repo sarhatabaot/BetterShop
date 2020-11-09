@@ -1,6 +1,7 @@
 package pro.husk.bettershop.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
@@ -32,7 +33,12 @@ public class BetterShopCommands extends BaseCommand {
         if (shop == null) {
             shop = Shop.getFromName(Config.getDefaultShop());
         }
-        shop.open(player);
+
+        if (shop != null) {
+            shop.open(player);
+        } else {
+            throw new InvalidCommandArgument("Error - default shop does not exist! Please create one!");
+        }
     }
 
     @Subcommand("create")
