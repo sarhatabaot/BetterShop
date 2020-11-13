@@ -1,15 +1,17 @@
-package pro.husk.bettershop.objects.gui.edit;
+package pro.husk.bettershop.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
+import pro.husk.bettershop.util.TransactionUtil;
 
 public class EditShopItemContents implements CommonGUI {
 
@@ -35,7 +37,10 @@ public class EditShopItemContents implements CommonGUI {
 
             if (!MenuHelper.isItemStackEmpty(clickedItem)) {
                 shopItem.getContents().add(clickedItem);
+                TransactionUtil.removeCustomItem((Player) click.getWhoClicked(), clickedItem);
                 renderItems(pane, backGui, shopItem);
+                gui.update();
+                click.setCancelled(true);
             }
         });
 
@@ -49,11 +54,14 @@ public class EditShopItemContents implements CommonGUI {
     private void renderItems(StaticPane pane, CommonGUI backGui, ShopItem shopItem) {
         int i = 0;
         for (ItemStack itemStack : shopItem.getContents()) {
+            if (MenuHelper.isItemStackEmpty(itemStack)) continue;
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 ItemStack clickedItem = event.getCurrentItem();
                 shopItem.getContents().remove(clickedItem);
                 event.getWhoClicked().getInventory().addItem(clickedItem);
-                renderItems(pane, backGui, shopItem);
+                forceRefreshGUI();
+                gui.update();
+                event.setCancelled(true);
             });
 
             SlotLocation slotLoc = SlotLocation.fromSlotNumber(i, pane.getLength());
@@ -68,6 +76,7 @@ public class EditShopItemContents implements CommonGUI {
 
     @Override
     public void forceRefreshGUI() {
+        pane.clear();
         renderItems(pane, backGui, shopItem);
     }
 }

@@ -1,19 +1,17 @@
-package pro.husk.bettershop.objects.gui.edit;
+package pro.husk.bettershop.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.events.PlayerChatInput;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;

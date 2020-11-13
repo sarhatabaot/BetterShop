@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui.function;
+package pro.husk.bettershop.gui.function;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
@@ -31,7 +31,7 @@ public class TradeDisplay implements CommonGUI {
         this.shopItem = shopItem;
         this.gui = new Gui(3, ChatColor.GOLD + "Trade item:");
         this.backGui = backGui;
-        this.pane = new StaticPane(0, 0, 9, 1);
+        this.pane = new StaticPane(0, 0, 9, 3);
 
         forceRefreshGUI();
 
@@ -42,7 +42,8 @@ public class TradeDisplay implements CommonGUI {
 
     private void renderMenu(ShopItem shopItem, StaticPane pane, CommonGUI backGui) {
         ItemStack displayItem = shopItem.getItemStack().clone();
-        ItemStack confirmItem = ItemBuilder.builder(Material.GREEN_STAINED_GLASS_PANE).name(ChatColor.GREEN + "Confirm")
+        ItemStack confirmItem = ItemBuilder.builder(Material.GREEN_STAINED_GLASS_PANE)
+                .name(ChatColor.GREEN + "Confirm")
                 .addLore(ChatColor.GOLD + "Click me to confirm the trade").build();
 
         ItemStack filler = ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name("").build();
@@ -54,7 +55,7 @@ public class TradeDisplay implements CommonGUI {
             ItemStack itemStack = shopItemContents.get(i);
 
             GuiItem guiItem = new GuiItem(itemStack);
-            SlotLocation slotLocation = SlotLocation.fromSlotNumber(i + 10, pane.getLength());
+            SlotLocation slotLocation = SlotLocation.fromSlotNumber(i + 9, pane.getLength());
 
             pane.addItem(guiItem, slotLocation.getX(), slotLocation.getY());
         }
@@ -84,7 +85,6 @@ public class TradeDisplay implements CommonGUI {
         pane.addItem(displayGuiItem, displayLocation.getX(), displayLocation.getY());
         pane.addItem(backButton, backLocation.getX(), backLocation.getY());
         pane.addItem(confirmGuiItem, confirmLocation.getX(), confirmLocation.getY());
-
     }
 
     private void handleTrade(InventoryClickEvent event, ShopItem shopItem) {
@@ -92,7 +92,8 @@ public class TradeDisplay implements CommonGUI {
 
         boolean hasAll = true;
         for (ItemStack itemStack : shopItem.getContents()) {
-            if (TransactionUtil.getContainsAmount(player, itemStack) <= 0) {
+            int containsAmount = TransactionUtil.getContainsAmount(player, itemStack);
+            if (containsAmount <= 0) {
                 hasAll = false;
             }
         }
@@ -114,6 +115,10 @@ public class TradeDisplay implements CommonGUI {
             }
         } else {
             event.setCancelled(true);
+        }
+
+        if (shopItem.isCloseOnTransaction()) {
+            player.closeInventory();
         }
     }
 

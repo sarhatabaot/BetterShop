@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui.function;
+package pro.husk.bettershop.gui.function;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
@@ -187,7 +187,9 @@ public class BuyDisplay implements CommonGUI {
                 player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + balance);
             }
 
-            player.closeInventory();
+            if (shopItem.isCloseOnTransaction()) {
+                player.closeInventory();
+            }
         }
     }
 

@@ -28,8 +28,8 @@ public final class TransactionUtil {
     /**
      * Utility method to check if two ItemStacks are equal
      *
-     * @param first  itemstack
-     * @param second itemstack
+     * @param first  itemStack to compare
+     * @param second itemStack to compare
      * @return whether they are the same
      */
     public static boolean itemEquals(ItemStack first, ItemStack second) {
@@ -38,7 +38,7 @@ public final class TransactionUtil {
         }
 
         boolean sameType = (first.getType() == second.getType());
-        boolean sameData = (first.getData() == second.getData());
+        boolean sameData = (first.getData().equals(second.getData()));
         boolean sameHasItemMeta = (first.hasItemMeta() == second.hasItemMeta());
         boolean sameEnchantments = (first.getEnchantments().equals(second.getEnchantments()));
         boolean sameItemMeta = false;
@@ -55,11 +55,11 @@ public final class TransactionUtil {
 
             if (sameHasDisplayName && firstItemMeta.hasDisplayName()) {
                 sameDisplayName = firstItemMeta.getDisplayName().equals(secondItemMeta.getDisplayName());
-            }
+            } else if (!firstItemMeta.hasDisplayName() && !secondItemMeta.hasDisplayName()) sameDisplayName = true;
 
             if (sameHasLore && firstItemMeta.hasLore()) {
                 sameLore = firstItemMeta.getLore().equals(secondItemMeta.getLore());
-            }
+            } else if (!firstItemMeta.hasLore() && !secondItemMeta.hasLore()) sameLore = true;
 
             sameItemMeta = sameLore && sameDisplayName;
         } else if (!first.hasItemMeta() && !second.hasItemMeta())
@@ -72,7 +72,7 @@ public final class TransactionUtil {
         int amountToRemove = item.getAmount();
 
         for (ItemStack search : player.getInventory()) {
-            if (amountToRemove != 0) {
+            if (amountToRemove > 0) {
                 if (search != null) {
                     if (itemEquals(search, item)) {
                         int searchAmount = search.getAmount();

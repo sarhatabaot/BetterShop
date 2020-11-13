@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui;
+package pro.husk.bettershop.gui;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import org.bukkit.entity.HumanEntity;

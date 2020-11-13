@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui.edit;
+package pro.husk.bettershop.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -7,14 +7,14 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.Visibility;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 
-public class EditShopItemVisibility implements CommonGUI {
+public class EditShopItemFunction implements CommonGUI {
 
     @Getter
     private final Gui gui;
@@ -22,8 +22,8 @@ public class EditShopItemVisibility implements CommonGUI {
     private final CommonGUI backGui;
     private final StaticPane pane;
 
-    public EditShopItemVisibility(ShopItem shopItem, CommonGUI backGui) {
-        this.gui = new Gui(1, ChatColor.GOLD + "Editing visibility:");
+    public EditShopItemFunction(ShopItem shopItem, CommonGUI backGui) {
+        this.gui = new Gui(1, ChatColor.GOLD + "Editing function:");
         this.shopItem = shopItem;
         this.backGui = backGui;
         this.pane = new StaticPane(0, 0, 9, 1);
@@ -40,18 +40,18 @@ public class EditShopItemVisibility implements CommonGUI {
     }
 
     private void renderItems(StaticPane pane, CommonGUI backGui, ShopItem shopItem) {
-        int visibilityAmount = Visibility.values().length;
+        int shopFunctionAmount = ShopFunction.values().length;
 
         // Display an item for each function
-        for (int i = 0; i < visibilityAmount; i++) {
-            Visibility visibility = Visibility.values()[i];
+        for (int i = 0; i < shopFunctionAmount; i++) {
+            ShopFunction function = ShopFunction.values()[i];
 
-            ItemStack itemStack = ItemBuilder.builder(Material.GLASS).name(ChatColor.GOLD + visibility.name())
+            ItemStack itemStack = ItemBuilder.builder(Material.BOOKSHELF).name(ChatColor.GOLD + function.name())
                     .build();
 
             GuiItem guiItem = new GuiItem(itemStack, click -> {
                 int clickedSlotIndex = click.getSlot();
-                shopItem.setVisibility(Visibility.values()[clickedSlotIndex]);
+                shopItem.setShopFunction(ShopFunction.values()[clickedSlotIndex]);
                 backGui.show(click.getWhoClicked());
             });
 
@@ -62,7 +62,7 @@ public class EditShopItemVisibility implements CommonGUI {
 
         // Add back button
         SlotLocation backSlot = SlotLocation.fromSlotNumber(8, pane.getLength());
-        pane.addItem(MenuHelper.getBackButton(backGui), backSlot.getX(), backSlot.getY());
+        pane.addItem(MenuHelper.getBackButton(this), backSlot.getX(), backSlot.getY());
     }
 
     @Override

@@ -1,17 +1,19 @@
-package pro.husk.bettershop.objects.gui.edit;
+package pro.husk.bettershop.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.objects.Shop;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
+import pro.husk.bettershop.util.TransactionUtil;
 
 public class EditShopDisplay implements CommonGUI {
 
@@ -20,6 +22,7 @@ public class EditShopDisplay implements CommonGUI {
     private final Shop shop;
     private final StaticPane pane;
     private ShopItem moveItem;
+    private SlotLocation priorSlotLocation;
 
     public EditShopDisplay(Shop shop) {
         this.shop = shop;
@@ -32,21 +35,33 @@ public class EditShopDisplay implements CommonGUI {
 
         gui.setOnTopClick(click -> {
             ItemStack clickedItem = click.getCurrentItem();
+            SlotLocation slotLocation = SlotLocation.fromSlotNumber(click.getSlot(), pane.getLength());
             ShopItem clickedShopItem = shop.getContentsMap()
-                    .get(SlotLocation.fromSlotNumber(click.getSlot(), pane.getLength()));
+                    .get(slotLocation);
+
+            Player clicker = (Player) click.getWhoClicked();
 
             // Handle moving items from bottom inv to upper
             if (moveItem != null) {
                 if (MenuHelper.isItemStackEmpty(clickedItem)) {
-                    shop.addItem(moveItem, SlotLocation.fromSlotNumber(click.getSlot(), pane.getLength()));
-                    click.getWhoClicked().getInventory().remove(moveItem.getItemStack());
+                    shop.addItem(moveItem, slotLocation);
+
+                    // Remove the source of the shop item correctly
+                    if (priorSlotLocation != null) {
+                        shop.getContentsMap().remove(priorSlotLocation);
+                    } else {
+                        TransactionUtil.removeCustomItem(clicker, moveItem.getItemStack());
+                    }
+
                     moveItem = null;
+                    priorSlotLocation = null;
                     gui.setTitle(ChatColor.GOLD + shop.getName());
-                    renderShopItems(shop, pane);
+                    forceRefreshGUI();
                 }
             } else {
                 if (click.isRightClick()) {
                     moveItem = clickedShopItem;
+                    priorSlotLocation = slotLocation;
                     gui.setTitle(ChatColor.GREEN + "Now select the new slot");
                 } else if (click.isLeftClick()) {
                     if (clickedShopItem != null) {
@@ -66,6 +81,13 @@ public class EditShopDisplay implements CommonGUI {
             if (!MenuHelper.isItemStackEmpty(clickedItem)) {
                 moveItem = new ShopItem(clickedItem);
                 gui.setTitle(ChatColor.GREEN + "Now select the new slot");
+            } else if (moveItem != null && priorSlotLocation != null) {
+                shop.getContentsMap().remove(priorSlotLocation, moveItem);
+                click.getWhoClicked().getInventory().setItem(click.getSlot(), moveItem.getItemStack());
+                moveItem = null;
+                priorSlotLocation = null;
+                gui.setTitle(ChatColor.GOLD + shop.getName());
+                forceRefreshGUI();
             }
 
             gui.update();
@@ -79,7 +101,7 @@ public class EditShopDisplay implements CommonGUI {
             ItemStack itemStack = shopItem.getItemStack().clone();
 
             GuiItem guiItem = new GuiItem(itemStack, event -> {
-                if (event.getClick() == ClickType.RIGHT) {
+                if (event.getClick() == ClickType.LEFT) {
                     new EditShopItemGUI(shopItem, this).show(event.getWhoClicked());
                 }
             });
@@ -90,6 +112,7 @@ public class EditShopDisplay implements CommonGUI {
 
     @Override
     public void forceRefreshGUI() {
+        pane.clear();
         renderShopItems(shop, pane);
     }
 }

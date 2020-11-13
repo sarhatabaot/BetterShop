@@ -4,7 +4,7 @@ import com.github.stefvanschie.inventoryframework.GuiItem;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 
 public final class MenuHelper {
 

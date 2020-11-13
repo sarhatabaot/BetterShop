@@ -49,6 +49,10 @@ public class ShopItem {
     @Getter
     private final List<ItemStack> contents;
 
+    @Getter
+    @Setter
+    private boolean closeOnTransaction;
+
     /**
      * Constructor for a ShopItem
      *
@@ -67,7 +71,7 @@ public class ShopItem {
      */
     public ShopItem(ItemStack itemStack, ShopFunction shopFunction, int buyCost, int sellCost,
                     int cooldownSeconds, Visibility visibility, String permission,
-                    List<String> messages, List<ItemStack> contents, List<String> commands) {
+                    List<String> messages, List<ItemStack> contents, List<String> commands, boolean closeOnTransaction) {
         this.itemStack = itemStack;
         this.shopFunction = shopFunction;
         this.buyCost = buyCost;
@@ -78,6 +82,7 @@ public class ShopItem {
         this.permission = permission;
         this.contents = contents;
         this.commands = commands;
+        this.closeOnTransaction = closeOnTransaction;
     }
 
     /**
@@ -87,7 +92,7 @@ public class ShopItem {
      */
     public ShopItem(ItemStack itemStack) {
         this(itemStack, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, null, null,
-                new ArrayList<>(), null);
+                new ArrayList<>(), null, true);
     }
 
     /**
@@ -135,7 +140,7 @@ public class ShopItem {
 
     public String getItemStackName() {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        return itemMeta.getDisplayName();
+        return itemMeta != null ? itemMeta.getDisplayName() : null;
     }
 
     public void addCommand(String command) {

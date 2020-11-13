@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui.function;
+package pro.husk.bettershop.gui.function;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -14,7 +14,7 @@ import pro.husk.bettershop.objects.Shop;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.Visibility;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.TransactionUtil;
 
 import java.util.List;

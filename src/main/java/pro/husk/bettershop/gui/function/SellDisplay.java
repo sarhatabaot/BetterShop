@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui.function;
+package pro.husk.bettershop.gui.function;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -11,8 +11,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.objects.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
@@ -79,6 +79,12 @@ public class SellDisplay implements CommonGUI {
                 .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
                 .build();
 
+        ItemStack sellAll = plusItem.name(ChatColor.YELLOW + "Left click to add all available")
+                .clearLore()
+                .addLore(ChatColor.RED + "Right click to set back to 0")
+                .addLore("", ChatColor.BLUE + "Amount: " + amount, ChatColor.GREEN + "You will receive: " + reward)
+                .build();
+
         ItemStack displayItem = shopItem.getItemStack().clone();
         ItemMeta itemMeta = displayItem.getItemMeta();
         List<String> lore = itemMeta.getLore();
@@ -128,6 +134,16 @@ public class SellDisplay implements CommonGUI {
             show(event.getWhoClicked());
         });
 
+        GuiItem sellAllGuiItem = new GuiItem(sellAll, event -> {
+            Player player = (Player) event.getWhoClicked();
+            if (event.getClick() == ClickType.LEFT) {
+                amount = TransactionUtil.getContainsAmount(player, shopItem.getItemStack());
+            } else {
+                amount = 0;
+            }
+            show(player);
+        });
+
         // Get the respective locations
         SlotLocation plus1Location = SlotLocation.fromSlotNumber(20, pane.getLength());
         SlotLocation plus8Location = SlotLocation.fromSlotNumber(21, pane.getLength());
@@ -135,6 +151,7 @@ public class SellDisplay implements CommonGUI {
         SlotLocation plus32Location = SlotLocation.fromSlotNumber(23, pane.getLength());
         SlotLocation plus64Location = SlotLocation.fromSlotNumber(24, pane.getLength());
         SlotLocation plus128Location = SlotLocation.fromSlotNumber(31, pane.getLength());
+        SlotLocation sellAllLocation = SlotLocation.fromSlotNumber(40, pane.getLength());
         SlotLocation displayLocation = SlotLocation.fromSlotNumber(49, pane.getLength());
         SlotLocation backLocation = SlotLocation.fromSlotNumber(4, pane.getLength());
 
@@ -145,6 +162,7 @@ public class SellDisplay implements CommonGUI {
         pane.addItem(plus32GuiItem, plus32Location.getX(), plus32Location.getY());
         pane.addItem(plus64GuiItem, plus64Location.getX(), plus64Location.getY());
         pane.addItem(plus128GuiItem, plus128Location.getX(), plus128Location.getY());
+        pane.addItem(sellAllGuiItem, sellAllLocation.getX(), sellAllLocation.getY());
         pane.addItem(displayGuiItem, displayLocation.getX(), displayLocation.getY());
         pane.addItem(backButton, backLocation.getX(), backLocation.getY());
 
@@ -186,7 +204,10 @@ public class SellDisplay implements CommonGUI {
                 player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$"
                         + TransactionUtil.getBalance(player));
             }
-            player.closeInventory();
+
+            if (shopItem.isCloseOnTransaction()) {
+                player.closeInventory();
+            }
         }
     }
 

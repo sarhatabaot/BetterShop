@@ -10,9 +10,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.BetterShop;
-import pro.husk.bettershop.objects.gui.CommonGUI;
-import pro.husk.bettershop.objects.gui.edit.EditShopDisplay;
-import pro.husk.bettershop.objects.gui.function.ViewShopDisplay;
+import pro.husk.bettershop.gui.CommonGUI;
+import pro.husk.bettershop.gui.edit.EditShopDisplay;
+import pro.husk.bettershop.gui.function.ViewShopDisplay;
 import pro.husk.bettershop.util.SlotLocation;
 
 import java.io.File;
@@ -88,13 +88,14 @@ public class Shop {
             List<String> messages = section.getStringList(key + ".messages");
             String permission = section.getString(key + ".permission");
             List<String> commands = section.getStringList(key + ".commands");
+            boolean closeOnTransaction = section.getBoolean(key + ".close_on_transaction");
 
             ShopFunction function = ShopFunction.valueOf(functionString);
             Visibility visibility = Visibility.valueOf(visibilityString);
 
             SlotLocation slotLocation = SlotLocation.fromString(key);
             ShopItem shopItem = new ShopItem(itemStack, function, buyCost, sellCost, cooldown, visibility, permission,
-                    messages, itemStackContents, commands);
+                    messages, itemStackContents, commands, closeOnTransaction);
 
             shop.getContentsMap().put(slotLocation, shopItem);
         });

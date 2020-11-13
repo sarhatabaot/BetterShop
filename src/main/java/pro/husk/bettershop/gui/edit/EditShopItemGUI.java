@@ -1,4 +1,4 @@
-package pro.husk.bettershop.objects.gui.edit;
+package pro.husk.bettershop.gui.edit;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
@@ -12,7 +12,7 @@ import pro.husk.bettershop.events.PlayerChatInput;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.Visibility;
-import pro.husk.bettershop.objects.gui.CommonGUI;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
@@ -69,6 +69,11 @@ public class EditShopItemGUI implements CommonGUI {
         ItemBuilder.Builder editCommandItemBuilder = ItemBuilder.builder(Material.WRITTEN_BOOK)
                 .name(ChatColor.GOLD + "Commands")
                 .addLore(ChatColor.YELLOW + "Add commands to run when users buy this item");
+
+        ItemStack editCloseOnTransactionItem = ItemBuilder.builder(Material.BARRIER)
+                .name(ChatColor.GOLD + "Close on transaction")
+                .addLore(ChatColor.YELLOW + "Should this item close the menu on finalised transaction?")
+                .addLore(ChatColor.RED + "Currently: " + shopItem.isCloseOnTransaction()).build();
 
         // Add messages to the lore if present
         List<String> messages = shopItem.getMessages();
@@ -177,6 +182,12 @@ public class EditShopItemGUI implements CommonGUI {
             editVisibility.show(event.getWhoClicked());
         });
 
+        GuiItem editCloseOnTransactionGuiItem = new GuiItem(editCloseOnTransactionItem, event -> {
+            shopItem.setCloseOnTransaction(!shopItem.isCloseOnTransaction());
+            renderItems(pane, backGui);
+            gui.update();
+        });
+
         // Build the SlotLocation for each of these
         SlotLocation displayItemSlot = SlotLocation.fromSlotNumber(4, pane.getLength());
         SlotLocation editDisplaySlot = SlotLocation.fromSlotNumber(13, pane.getLength());
@@ -189,6 +200,7 @@ public class EditShopItemGUI implements CommonGUI {
         SlotLocation editCommandsSlot = SlotLocation.fromSlotNumber(16, pane.getLength());
         SlotLocation editVisiblitySlot = SlotLocation.fromSlotNumber(10, pane.getLength());
         SlotLocation backButtonSlot = SlotLocation.fromSlotNumber(22, pane.getLength());
+        SlotLocation editCloseOnTransactionSlot = SlotLocation.fromSlotNumber(17, pane.getLength());
 
         // Insert them all onto the pane
         pane.addItem(displayGuiItem, displayItemSlot.getX(), displayItemSlot.getY());
@@ -197,6 +209,7 @@ public class EditShopItemGUI implements CommonGUI {
         pane.addItem(editMessagesGuiItem, editMessagesSlot.getX(), editMessagesSlot.getY());
         pane.addItem(editVisibilityGuiItem, editVisiblitySlot.getX(), editVisiblitySlot.getY());
         pane.addItem(MenuHelper.getBackButton(backGui), backButtonSlot.getX(), backButtonSlot.getY());
+        pane.addItem(editCloseOnTransactionGuiItem, editCloseOnTransactionSlot.getX(), editCloseOnTransactionSlot.getY());
 
         // Build the gui relevant to the function
         ShopFunction function = shopItem.getShopFunction();
