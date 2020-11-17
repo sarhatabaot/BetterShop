@@ -18,6 +18,13 @@
     </properties>
     <url>https://husk.pro/</url>
 
+    <distributionManagement>
+        <repository>
+            <id>husk</id>
+            <url>https://maven.husk.pro/repository/maven-public/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>

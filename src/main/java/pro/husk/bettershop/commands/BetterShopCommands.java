@@ -27,8 +27,9 @@ public class BetterShopCommands extends BaseCommand {
     }
 
     @Default
+    @CommandAlias("open")
     @Description("Shows the default shop")
-    @CommandCompletion("* @shops")
+    @CommandCompletion("@shops")
     public void shop(Player player, @Optional Shop shop) {
         if (shop == null) {
             shop = Shop.getFromName(Config.getDefaultShop());
@@ -57,7 +58,7 @@ public class BetterShopCommands extends BaseCommand {
 
     @Subcommand("edit")
     @CommandPermission("shop.edit")
-    @CommandCompletion("* @shops")
+    @CommandCompletion("@shops")
     @Description("Edits a shop")
     public void edit(Player player, Shop shop) {
         shop.editShop(player);
@@ -65,7 +66,7 @@ public class BetterShopCommands extends BaseCommand {
 
     @Subcommand("delete")
     @CommandPermission("shop.delete")
-    @CommandCompletion("* @shops")
+    @CommandCompletion("@shops")
     @Description("Deletes a shop")
     public void delete(Player player, Shop shop) {
         if (shop.delete()) {
