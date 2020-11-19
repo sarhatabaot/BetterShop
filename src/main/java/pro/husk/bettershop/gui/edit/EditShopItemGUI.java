@@ -54,10 +54,10 @@ public class EditShopItemGUI implements CommonGUI {
                 .addLore(ChatColor.BLUE + "Current function: " + ChatColor.AQUA + shopItem.getShopFunction().name())
                 .build();
 
-        ItemStack editBuyCostItem = ItemBuilder.builder(Material.GOLD_INGOT).name(ChatColor.GOLD + "Change cost")
+        ItemStack editBuyCostItem = ItemBuilder.builder(Material.GOLD_INGOT).name(ChatColor.GOLD + "Change buy price")
                 .addLore(ChatColor.WHITE + "Cost: " + ChatColor.GREEN + shopItem.getBuyCost()).build();
 
-        ItemStack editSellCostItem = ItemBuilder.builder(Material.DIAMOND).name(ChatColor.GOLD + "Change sell cost")
+        ItemStack editSellCostItem = ItemBuilder.builder(Material.DIAMOND).name(ChatColor.GOLD + "Change sell price")
                 .addLore(ChatColor.WHITE + "Sell: " + ChatColor.GREEN + shopItem.getSellCost()).build();
 
         ItemStack editContentsItem = ItemBuilder.builder(Material.CHEST).name(ChatColor.GREEN + "Item inventory")
