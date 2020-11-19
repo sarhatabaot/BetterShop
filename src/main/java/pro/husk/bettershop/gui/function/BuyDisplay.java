@@ -184,7 +184,7 @@ public class BuyDisplay implements CommonGUI {
                         + " " + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
                         + cost);
 
-                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + balance);
+                player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + TransactionUtil.getBalance(player));
             }
 
             if (shopItem.isCloseOnTransaction()) {
