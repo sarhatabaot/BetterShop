@@ -56,8 +56,9 @@ public class ItemBuilder {
             return this;
         }
 
-        public void lore(List<String> lore) {
+        public Builder lore(List<String> lore) {
             this.lore = lore;
+            return this;
         }
 
         public Builder clearLore() {

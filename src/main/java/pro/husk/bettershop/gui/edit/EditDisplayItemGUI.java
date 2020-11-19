@@ -41,7 +41,8 @@ public class EditDisplayItemGUI implements CommonGUI {
         ItemBuilder.Builder nameItemBuilder = ItemBuilder.builder(Material.NAME_TAG)
                 .name(ChatColor.GREEN + "Change display name");
 
-        ItemBuilder.Builder loreItemBuilder = ItemBuilder.builder(Material.BOOK).name(ChatColor.GREEN + "Add lore");
+        ItemBuilder.Builder loreItemBuilder = ItemBuilder.builder(Material.BOOK)
+                .name(ChatColor.GREEN + "Add lore");
 
         ItemBuilder.Builder amountItemBuilder = ItemBuilder.builder(Material.ANVIL)
                 .name(ChatColor.GREEN + "Change amount")
@@ -51,6 +52,10 @@ public class EditDisplayItemGUI implements CommonGUI {
 
         nameItemBuilder.addNameToLoreIfSetOnArgument(shopItemStack);
         loreItemBuilder.setLoreIfSetOnArgument(shopItemStack);
+
+        // Set instructions
+        nameItemBuilder.addLore("", ChatColor.GRAY + "Left click to set", ChatColor.GRAY + "Right click to remove");
+        loreItemBuilder.addLore("", ChatColor.GRAY + "Left click to add", ChatColor.GRAY + "Right click to remove");
 
         // Handle name item
         GuiItem nameItem = new GuiItem(nameItemBuilder.build(), event -> {
@@ -63,6 +68,10 @@ public class EditDisplayItemGUI implements CommonGUI {
                     renderItems(pane, backGui);
                     gui.show(player);
                 }, "Please enter the new name");
+            } else if (event.getClick() == ClickType.RIGHT) {
+                shopItem.setItemStackName(null);
+                forceRefreshGUI();
+                gui.show(player);
             }
         });
 

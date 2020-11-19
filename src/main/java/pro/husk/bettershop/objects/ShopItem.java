@@ -116,7 +116,11 @@ public class ShopItem {
      * @return ItemStack of this ShopItem instance
      */
     public ItemStack getDisplayItem() {
-        ItemBuilder.Builder itemBuilder = ItemBuilder.builder(itemStack.getType()).addLore("")
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        ItemBuilder.Builder itemBuilder = ItemBuilder.builder(itemStack.getType())
+                .name(getItemStackName())
+                .lore(itemMeta.getLore())
+                .addLore("")
                 .addLore(ChatColor.BLUE + "Function: " + shopFunction)
                 .addLore(ChatColor.YELLOW + "Visibility: " + visibility);
 

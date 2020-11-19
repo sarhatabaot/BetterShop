@@ -27,7 +27,7 @@ public class BetterShopCommands extends BaseCommand {
     }
 
     @Default
-    @CommandAlias("open")
+    @Subcommand("open")
     @Description("Shows the default shop")
     @CommandCompletion("@shops")
     public void shop(Player player, @Optional Shop shop) {
