@@ -169,8 +169,7 @@ public class BuyDisplay implements CommonGUI {
         double balance = TransactionUtil.getBalance(player);
 
         if (balance >= cost) {
-            int totalCost = (int) (amount * cost);
-            TransactionUtil.deduct(player, totalCost);
+            TransactionUtil.deduct(player, (int) cost);
 
             HashMap<Integer, ItemStack> failedItems = player.getInventory().addItem(itemStack);
             if (!failedItems.isEmpty()) {
@@ -183,13 +182,15 @@ public class BuyDisplay implements CommonGUI {
             } else {
                 player.sendMessage(ChatColor.GREEN + "You have purchased " + ChatColor.AQUA + amount + ChatColor.WHITE
                         + " " + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
-                        + totalCost);
+                        + cost);
 
                 player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$" + balance);
             }
 
             if (shopItem.isCloseOnTransaction()) {
                 player.closeInventory();
+            } else {
+                backGui.show(player);
             }
         }
     }

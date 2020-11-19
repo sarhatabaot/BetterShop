@@ -190,9 +190,8 @@ public class SellDisplay implements CommonGUI {
         itemStack.setAmount(amount);
 
         if (TransactionUtil.getContainsAmount(player, itemStack) >= amount) {
-            int totalReward = (int) (amount * reward);
             TransactionUtil.removeCustomItem(player, itemStack);
-            TransactionUtil.add(player, totalReward);
+            TransactionUtil.add(player, (int) reward);
 
             List<String> messages = shopItem.getMessages();
             if (messages != null && messages.size() != 0) {
@@ -200,7 +199,7 @@ public class SellDisplay implements CommonGUI {
             } else {
                 player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.AQUA + amount + ChatColor.WHITE + " "
                         + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
-                        + totalReward);
+                        + reward);
 
                 player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$"
                         + TransactionUtil.getBalance(player));
@@ -208,6 +207,8 @@ public class SellDisplay implements CommonGUI {
 
             if (shopItem.isCloseOnTransaction()) {
                 player.closeInventory();
+            } else {
+                backGui.show(player);
             }
         }
     }
