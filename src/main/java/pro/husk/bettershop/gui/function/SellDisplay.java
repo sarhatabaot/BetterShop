@@ -200,7 +200,7 @@ public class SellDisplay implements CommonGUI {
             } else {
                 player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.AQUA + amount + ChatColor.WHITE + " "
                         + shopItem.getItemStackName() + ChatColor.GREEN + " for " + ChatColor.DARK_GREEN + "$"
-                        + reward);
+                        + totalReward);
 
                 player.sendMessage(ChatColor.GREEN + "Your new balance is " + ChatColor.DARK_GREEN + "$"
                         + TransactionUtil.getBalance(player));
