@@ -169,7 +169,8 @@ public class BuyDisplay implements CommonGUI {
         double balance = TransactionUtil.getBalance(player);
 
         if (balance >= cost) {
-            TransactionUtil.deduct(player, amount);
+            int totalCost = (int) (amount * cost);
+            TransactionUtil.deduct(player, totalCost);
 
             HashMap<Integer, ItemStack> failedItems = player.getInventory().addItem(itemStack);
             if (!failedItems.isEmpty()) {

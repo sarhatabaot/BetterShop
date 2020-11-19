@@ -190,8 +190,9 @@ public class SellDisplay implements CommonGUI {
         itemStack.setAmount(amount);
 
         if (TransactionUtil.getContainsAmount(player, itemStack) >= amount) {
+            int totalReward = (int) (amount * reward);
             TransactionUtil.removeCustomItem(player, itemStack);
-            TransactionUtil.add(player, amount);
+            TransactionUtil.add(player, totalReward);
 
             List<String> messages = shopItem.getMessages();
             if (messages != null && messages.size() != 0) {
