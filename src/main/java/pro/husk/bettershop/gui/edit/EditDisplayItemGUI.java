@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.events.PlayerChatInput;
-import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.gui.CommonGUI;
+import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
@@ -43,10 +43,6 @@ public class EditDisplayItemGUI implements CommonGUI {
 
         ItemBuilder.Builder loreItemBuilder = ItemBuilder.builder(Material.BOOK)
                 .name(ChatColor.GREEN + "Add lore");
-
-        ItemBuilder.Builder amountItemBuilder = ItemBuilder.builder(Material.ANVIL)
-                .name(ChatColor.GREEN + "Change amount")
-                .addLore("" + ChatColor.WHITE + shopItem.getItemStack().getAmount());
 
         ItemStack shopItemStack = shopItem.getItemStack().clone();
 
@@ -93,30 +89,13 @@ public class EditDisplayItemGUI implements CommonGUI {
             }
         });
 
-        GuiItem amountItem = new GuiItem(amountItemBuilder.build(), event -> {
-            Player player = (Player) event.getWhoClicked();
-
-            if (event.getClick() == ClickType.LEFT) {
-                player.closeInventory();
-                PlayerChatInput.addWaitingOnInput(player, callback -> {
-                    shopItem.setItemStack(
-                            ItemBuilder.builder(shopItemStack).amount(Integer.parseInt(callback)).build());
-                    PlayerChatInput.removeWaitingOnInput(player);
-                    renderItems(pane, backGui);
-                    gui.show(player);
-                }, "Please enter the new amount");
-            }
-        });
-
         // Build SlotLocations of the wanted slots
         SlotLocation nameSlot = SlotLocation.fromSlotNumber(0, pane.getLength());
         SlotLocation loreSlot = SlotLocation.fromSlotNumber(1, pane.getLength());
-        SlotLocation amountSlot = SlotLocation.fromSlotNumber(2, pane.getLength());
         SlotLocation backSlot = SlotLocation.fromSlotNumber(8, pane.getLength());
 
         pane.addItem(nameItem, nameSlot.getX(), nameSlot.getY());
         pane.addItem(loreItem, loreSlot.getX(), loreSlot.getY());
-        pane.addItem(amountItem, amountSlot.getX(), amountSlot.getY());
         pane.addItem(MenuHelper.getBackButton(backGui), backSlot.getX(), backSlot.getY());
     }
 

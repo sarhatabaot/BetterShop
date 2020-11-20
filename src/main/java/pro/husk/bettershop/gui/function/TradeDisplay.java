@@ -119,6 +119,8 @@ public class TradeDisplay implements CommonGUI {
 
         if (shopItem.isCloseOnTransaction()) {
             player.closeInventory();
+        } else {
+            backGui.show(player);
         }
     }
 

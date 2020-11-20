@@ -62,8 +62,16 @@ public final class TransactionUtil {
             } else if (!firstItemMeta.hasLore() && !secondItemMeta.hasLore()) sameLore = true;
 
             sameItemMeta = sameLore && sameDisplayName;
-        } else if (!first.hasItemMeta() && !second.hasItemMeta())
+        } else if (!first.hasItemMeta() && !second.hasItemMeta()) {
             sameItemMeta = true;
+        } else if (!first.hasItemMeta() && second.hasItemMeta()) { // Fix for IF adding 'if-uuid' to nbt
+            ItemMeta secondItemMeta = second.getItemMeta();
+
+            if (secondItemMeta.getPersistentDataContainer().getKeys().size() == 1) {
+                sameHasItemMeta = true;
+                sameItemMeta = true;
+            }
+        }
 
         return sameType && sameData && sameHasItemMeta && sameEnchantments && sameItemMeta;
     }
