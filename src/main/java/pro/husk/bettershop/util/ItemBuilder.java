@@ -98,7 +98,7 @@ public class ItemBuilder {
         public ItemStack build() {
             ItemStack itemStack = new ItemStack(type, amount);
 
-            itemStack.addEnchantments(enchantments);
+            if (!enchantments.isEmpty()) itemStack.addUnsafeEnchantments(enchantments);
 
             ItemMeta itemMeta = itemStack.getItemMeta();
 
