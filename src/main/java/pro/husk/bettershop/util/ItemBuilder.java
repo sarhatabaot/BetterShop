@@ -1,12 +1,15 @@
 package pro.husk.bettershop.util;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ItemBuilder {
 
@@ -28,10 +31,12 @@ public class ItemBuilder {
         private int amount;
         private String displayName;
         private List<String> lore;
+        private Map<Enchantment, Integer> enchantments;
 
         private Builder(Material type, int amount) {
             this.type = type;
             this.amount = amount;
+            this.enchantments = new HashMap<>();
         }
 
         private Builder(ItemStack itemStack) {
@@ -39,6 +44,7 @@ public class ItemBuilder {
             this.amount = itemStack.getAmount();
             this.lore = itemStack.getItemMeta().getLore();
             this.displayName = itemStack.getItemMeta().getDisplayName();
+            this.enchantments = itemStack.getEnchantments();
         }
 
         public Builder amount(int amount) {
@@ -73,6 +79,16 @@ public class ItemBuilder {
             return this;
         }
 
+        public Builder addEnchantment(Enchantment enchantment, int level) {
+            enchantments.put(enchantment, level);
+            return this;
+        }
+
+        public Builder setEnchantments(Map<Enchantment, Integer> enchantments) {
+            this.enchantments = enchantments;
+            return this;
+        }
+
         public Builder removeLore() {
             int lastIndex = this.lore.size() - 1;
             lore.remove(lastIndex);
@@ -81,6 +97,8 @@ public class ItemBuilder {
 
         public ItemStack build() {
             ItemStack itemStack = new ItemStack(type, amount);
+
+            itemStack.addEnchantments(enchantments);
 
             ItemMeta itemMeta = itemStack.getItemMeta();
 

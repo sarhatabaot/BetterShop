@@ -98,7 +98,7 @@ public class EditShopDisplay implements CommonGUI {
 
     private void renderShopItems(Shop shop, StaticPane pane) {
         shop.getContentsMap().forEach((slotLocation, shopItem) -> {
-            ItemStack itemStack = shopItem.getItemStack().clone();
+            ItemStack itemStack = shopItem.getItemStack();
 
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 if (event.getClick() == ClickType.LEFT) {

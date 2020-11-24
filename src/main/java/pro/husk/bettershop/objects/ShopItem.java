@@ -122,7 +122,7 @@ public class ShopItem {
                 .lore(itemMeta.getLore())
                 .addLore("")
                 .addLore(ChatColor.BLUE + "Function: " + shopFunction)
-                .addLore(ChatColor.YELLOW + "Visibility: " + visibility);
+                .setEnchantments(itemStack.getEnchantments());
 
         if (shopFunction == ShopFunction.BUY) {
             itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
