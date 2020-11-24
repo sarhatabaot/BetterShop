@@ -83,7 +83,12 @@ public class EditShopDisplay implements CommonGUI {
                 gui.setTitle(ChatColor.GREEN + "Now select the new slot");
             } else if (moveItem != null && priorSlotLocation != null) {
                 shop.getContentsMap().remove(priorSlotLocation, moveItem);
-                click.getWhoClicked().getInventory().setItem(click.getSlot(), moveItem.getItemStack());
+
+                // Only set one item in the slot (issue #21)
+                ItemStack itemStack = moveItem.getItemStack().clone();
+                itemStack.setAmount(1);
+                click.getWhoClicked().getInventory().setItem(click.getSlot(), itemStack);
+                
                 moveItem = null;
                 priorSlotLocation = null;
                 gui.setTitle(ChatColor.GOLD + shop.getName());
