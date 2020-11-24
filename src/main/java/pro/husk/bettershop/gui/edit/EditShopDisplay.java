@@ -44,7 +44,6 @@ public class EditShopDisplay implements CommonGUI {
             // Handle moving items from bottom inv to upper
             if (moveItem != null) {
                 if (MenuHelper.isItemStackEmpty(clickedItem)) {
-                    shop.addItem(moveItem, slotLocation);
 
                     // Remove the source of the shop item correctly
                     if (priorSlotLocation != null) {
@@ -52,6 +51,10 @@ public class EditShopDisplay implements CommonGUI {
                     } else {
                         TransactionUtil.removeCustomItem(clicker, moveItem.getItemStack());
                     }
+
+                    // Add only one of the item (issue #21)
+                    moveItem.getItemStack().setAmount(1);
+                    shop.addItem(moveItem, slotLocation);
 
                     moveItem = null;
                     priorSlotLocation = null;
@@ -83,12 +86,7 @@ public class EditShopDisplay implements CommonGUI {
                 gui.setTitle(ChatColor.GREEN + "Now select the new slot");
             } else if (moveItem != null && priorSlotLocation != null) {
                 shop.getContentsMap().remove(priorSlotLocation, moveItem);
-
-                // Only set one item in the slot (issue #21)
-                ItemStack itemStack = moveItem.getItemStack().clone();
-                itemStack.setAmount(1);
-                click.getWhoClicked().getInventory().setItem(click.getSlot(), itemStack);
-                
+                click.getWhoClicked().getInventory().setItem(click.getSlot(), moveItem.getItemStack());
                 moveItem = null;
                 priorSlotLocation = null;
                 gui.setTitle(ChatColor.GOLD + shop.getName());
