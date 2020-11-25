@@ -126,9 +126,12 @@ public class ShopItem {
 
         if (shopFunction == ShopFunction.BUY) {
             itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
-            itemBuilder.addLore(ChatColor.GREEN + "Sell: " + sellCost);
         } else if (shopFunction == ShopFunction.SELL) {
             itemBuilder.addLore(ChatColor.GREEN + "Sell: " + sellCost);
+        } else if (shopFunction == ShopFunction.BUY_AND_SELL) {
+            itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
+            itemBuilder.addLore(ChatColor.GREEN + "Sell: " + sellCost);
+            itemBuilder.addLore("", ChatColor.GRAY + "Left click to buy, Right click to sell");
         } else if (shopFunction == ShopFunction.COMMAND) {
             itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
         }
