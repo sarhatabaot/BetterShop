@@ -108,6 +108,7 @@ public class EditShopDisplay implements CommonGUI {
                     if (moveItem == null && priorSlotLocation == null) {
                         new EditShopItemGUI(shopItem, this).show(event.getWhoClicked());
                     } else {
+                        // Add a way to cancel moving item (issue #22)
                         moveItem = null;
                         priorSlotLocation = null;
                         gui.setTitle(ChatColor.GOLD + shop.getName());
