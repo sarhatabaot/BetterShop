@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.objects.Shop;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.Visibility;
-import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.TransactionUtil;
 
 import java.util.List;
@@ -46,8 +46,8 @@ public class ViewShopDisplay implements CommonGUI {
 
             String permission = shopItem.getPermission();
             boolean isSome = permission != null;
-
             boolean hideItem = visibility == Visibility.HIDDEN || (isSome && !viewer.hasPermission(permission));
+
             if (!hideItem) {
                 ItemStack itemStack = shopItem.getDisplayItem();
 
@@ -63,13 +63,15 @@ public class ViewShopDisplay implements CommonGUI {
         ShopFunction function = shopItem.getShopFunction();
 
         if (function == ShopFunction.BUY) {
+            new BuyDisplay(shopItem, this).show(player);
+        } else if (function == ShopFunction.SELL) {
+            new SellDisplay(shopItem, this).show(player);
+        } else if (function == ShopFunction.BUY_AND_SELL) {
             if (event.getClick() == ClickType.LEFT) {
                 new BuyDisplay(shopItem, this).show(player);
             } else if (event.getClick() == ClickType.RIGHT) {
                 new SellDisplay(shopItem, this).show(player);
             }
-        } else if (function == ShopFunction.SELL) {
-            new SellDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.TRADE) {
             new TradeDisplay(shopItem, this).show(player);
         } else if (function == ShopFunction.COMMAND) {

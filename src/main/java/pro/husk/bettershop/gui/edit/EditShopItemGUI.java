@@ -9,10 +9,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import pro.husk.bettershop.events.PlayerChatInput;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.objects.ShopFunction;
 import pro.husk.bettershop.objects.ShopItem;
 import pro.husk.bettershop.objects.Visibility;
-import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.ItemBuilder;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
@@ -216,6 +216,9 @@ public class EditShopItemGUI implements CommonGUI {
         if (function == ShopFunction.BUY) {
             pane.addItem(editBuyCostGuiItem, editBuyCostSlot.getX(), editBuyCostSlot.getY());
         } else if (function == ShopFunction.SELL) {
+            pane.addItem(editSellCostGuiItem, editSellCostSlot.getX(), editSellCostSlot.getY());
+        } else if (function == ShopFunction.BUY_AND_SELL) {
+            pane.addItem(editBuyCostGuiItem, editBuyCostSlot.getX(), editBuyCostSlot.getY());
             pane.addItem(editSellCostGuiItem, editSellCostSlot.getX(), editSellCostSlot.getY());
         } else if (function == ShopFunction.TRADE) {
             pane.addItem(editContentsGuiItem, editContentsSlot.getX(), editContentsSlot.getY());
