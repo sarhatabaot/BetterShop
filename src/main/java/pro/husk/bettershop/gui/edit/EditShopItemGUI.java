@@ -215,7 +215,6 @@ public class EditShopItemGUI implements CommonGUI {
         ShopFunction function = shopItem.getShopFunction();
         if (function == ShopFunction.BUY) {
             pane.addItem(editBuyCostGuiItem, editBuyCostSlot.getX(), editBuyCostSlot.getY());
-            pane.addItem(editSellCostGuiItem, editSellCostSlot.getX(), editSellCostSlot.getY());
         } else if (function == ShopFunction.SELL) {
             pane.addItem(editSellCostGuiItem, editSellCostSlot.getX(), editSellCostSlot.getY());
         } else if (function == ShopFunction.TRADE) {
