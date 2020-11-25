@@ -8,9 +8,9 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.objects.Shop;
 import pro.husk.bettershop.objects.ShopItem;
-import pro.husk.bettershop.gui.CommonGUI;
 import pro.husk.bettershop.util.MenuHelper;
 import pro.husk.bettershop.util.SlotLocation;
 import pro.husk.bettershop.util.TransactionUtil;
@@ -105,7 +105,14 @@ public class EditShopDisplay implements CommonGUI {
 
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 if (event.getClick() == ClickType.LEFT) {
-                    new EditShopItemGUI(shopItem, this).show(event.getWhoClicked());
+                    if (moveItem == null && priorSlotLocation == null) {
+                        new EditShopItemGUI(shopItem, this).show(event.getWhoClicked());
+                    } else {
+                        moveItem = null;
+                        priorSlotLocation = null;
+                        gui.setTitle(ChatColor.GOLD + shop.getName());
+                        gui.show(event.getWhoClicked());
+                    }
                 }
             });
 
