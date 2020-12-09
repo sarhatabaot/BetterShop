@@ -64,14 +64,13 @@ public class ShopItem {
      * @param cooldownSeconds how long a player is affected by a cooldown on this
      *                        item's shop function
      * @param visibility      who can see the item
-     * @param permission      what permission the user should have to see this
-     *                        item
+     * @param permission      what permission the user should have to see this item
      * @param messages        what messages to send the user upon sale
      * @param commands        what commands are run after an item sale
      */
-    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, int buyCost, int sellCost,
-                    int cooldownSeconds, Visibility visibility, String permission,
-                    List<String> messages, List<ItemStack> contents, List<String> commands, boolean closeOnTransaction) {
+    public ShopItem(ItemStack itemStack, ShopFunction shopFunction, int buyCost, int sellCost, int cooldownSeconds,
+            Visibility visibility, String permission, List<String> messages, List<ItemStack> contents,
+            List<String> commands, boolean closeOnTransaction) {
         this.itemStack = itemStack;
         this.shopFunction = shopFunction;
         this.buyCost = buyCost;
@@ -91,8 +90,7 @@ public class ShopItem {
      * @param itemStack of the ShopItem
      */
     public ShopItem(ItemStack itemStack) {
-        this(itemStack, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, null, null,
-                new ArrayList<>(), null, true);
+        this(itemStack, ShopFunction.NONE, 0, 0, 0, Visibility.ALL, null, null, new ArrayList<>(), null, true);
     }
 
     /**
@@ -117,12 +115,8 @@ public class ShopItem {
      */
     public ItemStack getDisplayItem() {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        ItemBuilder.Builder itemBuilder = ItemBuilder.builder(itemStack.getType())
-                .name(getItemStackName())
-                .lore(itemMeta.getLore())
-                .addLore("")
-                .addLore(ChatColor.BLUE + "Function: " + shopFunction)
-                .setEnchantments(itemStack.getEnchantments());
+        ItemBuilder.Builder itemBuilder = ItemBuilder.builder(itemStack.getType()).name(getItemStackName())
+                .lore(itemMeta.getLore()).setEnchantments(itemStack.getEnchantments());
 
         if (shopFunction == ShopFunction.BUY) {
             itemBuilder.addLore(ChatColor.DARK_GREEN + "Cost: " + buyCost);
