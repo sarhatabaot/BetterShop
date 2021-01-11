@@ -48,7 +48,7 @@ If you wish to develop a plugin that hooks into BetterShop, you can find the art
 ```xml
 <repository>
     <id>husk</id>
-    <url>https://maven.husk.pro/repository/maven-public/</url>
+    <url>https://maven.husk.pro/snapshots/</url>
 </repository>
 ```
 
