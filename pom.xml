@@ -53,6 +53,14 @@
                                     <pattern>com.github.stefvanschie.inventoryframework</pattern>
                                     <shadedPattern>pro.husk.bettershop.inventoryframework</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>co.aikar.commands</pattern>
+                                    <shadedPattern>pro.husk.bettershop.acf</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>co.aikar.locales</pattern>
+                                    <shadedPattern>pro.husk.bettershop.locales</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
